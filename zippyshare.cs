@@ -52,10 +52,54 @@ namespace GG_Downloader
 
     public class Zippyshare
     {
-        public static void Downloadfile(string fileUrl)
-        {
-            
 
+        public static void GetFileLink(string fileUrl){
+            
+            #region validInputVerification
+            //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
+            var m = Regex.Match(fileUrl, @"https?://((?:[\w\-]+))\.*zippyshare\.com/\w/(\w+)", RegexOptions.IgnoreCase);
+            if (!m.Success)
+            {
+                Console.WriteLine("Invalid zippyshare link!");
+                return;
+            }
+
+            #endregion 
+
+            // I believe this is breaking the thing up into the first bit and the unique ID
+            var server = m.Groups[1].Captures[0].Value;
+            var fileID = m.Groups[2].Captures[0].Value;
+            
+            Console.WriteLine("Server: " + server + "\nFileID: " + fileID);
+            
+            using (var client = new WebClientEx())
+            {
+                var website = client.DownloadString(fileUrl);
+
+                #region FileExistenceVerification
+
+                var regex = "File does not exist on this server";
+                var match = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+                regex = "File has expired and does not exist anymore on this server";
+                var match2 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+                if (match.Success || match2.Success)
+                {
+                    Console.WriteLine("File doesn't exist!");
+                    return;
+                }
+
+                #endregion
+                
+                var pattern_elements = @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
+                var matchString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
+                Console.WriteLine(matchString);
+                var quoteMatches = Regex.Matches(matchString)
+                
+                
+            }
+        }
+        
+        public static void Downloadfile(string fileUrl) {
             #region validInputVerification
             //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
             var m = Regex.Match(fileUrl, @"https?://((?:[\w\-]+))\.*zippyshare\.com/\w/(\w+)", RegexOptions.IgnoreCase);
@@ -102,13 +146,11 @@ namespace GG_Downloader
                 var fileName = match.Groups[6].Captures[0].Value;
                 var num = a % b + c % d;
 
-                client.DownloadFile("https://" + server + ".zippyshare.com/d/" + fileId + "/" + num + "/" + fileName,
-                    fileName);
                 Console.WriteLine("Downloading: " + "https://" + server + ".zippyshare.com/d/" + fid + "/" + num + "/" +
                                   fileName);
+                client.DownloadFile("https://" + server + ".zippyshare.com/d/" + fileId + "/" + num + "/" + fileName,
+                    fileName);
             }
-
-            Console.WriteLine("Downloading: " + "http://"+server+".zippyshare.com/d/"+fid+"/" +  + "/"+fileName);
         }
     }
 }

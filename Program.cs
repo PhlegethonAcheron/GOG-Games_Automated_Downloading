@@ -16,11 +16,20 @@ namespace GG_Downloader
        
         public static void Main(string[] args)
         {
-            IList<string> links = link_getter("https://gog-games.com/game/mule");
-            foreach(string e in links) {
-                Console.WriteLine(e);
-            }
 
+            
+            // https://www17.zippyshare.com/v/j3Ezawz5/file.html
+            // https://www101.zippyshare.com/v/SLrsee4W/file.html
+            
+            Console.WriteLine("First Link: " + "https://www17.zippyshare.com/v/j3Ezawz5/file.html");
+            Zippyshare.GetFileLink("https://www17.zippyshare.com/v/j3Ezawz5/file.html");
+  
+            // IList<string> links = link_getter("https://gog-games.com/game/mule");
+            // foreach(string e in links) {
+            //     Console.WriteLine(e);
+            //     Zippyshare.GetFileLink(e);
+            // }
+            
             // foreach (string i in links)
             // {
             //     Zippyshare.Downloadfile(i);
@@ -57,26 +66,11 @@ namespace GG_Downloader
             return foundFilteredLinks;
         } //input: gog-games url; output: zippy page URLS
         
-        public static string file_url_getter(string rawPageLink)
-        {
-            string pageContent;
-            HttpWebRequest myReq = (HttpWebRequest)WebRequest.Create(rawPageLink);
-            HttpWebResponse myres = (HttpWebResponse)myReq.GetResponse();
-
-            using (StreamReader sr = new StreamReader(myres.GetResponseStream()))
-            {
-                pageContent = sr.ReadToEnd();
-            }
-
-            if (pageContent.Contains("YourSearchWord"))
-            {
-                match = Regex.Match(pageContent,
-                    @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";",
-                    RegexOptions.IgnoreCase);
-            }
-
-            return "bloop";
-        }
+        // public static string file_url_getter(string rawPageLink)
+        // {
+        //     //validate link input; seems good to do, although in theory this method should never get invalid inputs)
+        //     
+        // }
 
         private static void Quit()
         {
