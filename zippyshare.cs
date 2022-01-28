@@ -84,50 +84,52 @@ namespace GG_Downloader
             #endregion 
 
             // I believe this is breaking the thing up into the first bit and the unique ID
-            var server = m.Groups[1].Captures[0].Value;
-            var fid = m.Groups[2].Captures[0].Value;
-            string matchedString;
-            Console.WriteLine("Server: " + server + "\nFileID: " + fid);
+            var serverId = m.Groups[1].Captures[0].Value;
 
             //Gets the Matched string that contains all the info needed to assemble the link
-            using (var client = new WebClientEx()){
+            using (var client = new WebClientEx())
+            {
                 var website = client.DownloadString(fileUrl);
-
-                #region FileExistenceVerification
-
-                var regex = "File does not exist on this server";
-                var match1 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
-                regex = "File has expired and does not exist anymore on this server";
-                var match2 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
-                if (match1.Success || match2.Success)
-                {
-                    Console.WriteLine("File doesn't exist!");
-                    return;
-                }
-
-                #endregion
-
-                var pattern_elements =
-                    @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
-                matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
-            
-                Console.WriteLine(matchedString);
-                
-                //Parsing the numbers out of the string
-                List<int> nums = new List<int>();
-                foreach(Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()), "(\\d+)")){
-                    nums.Add(int.Parse(match.ToString()));
-                }
-                
-                var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
-                var fileName = Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString();
-                var fileNumber = nums[0] % nums[1] + nums[2] + nums[3];
-                Console.WriteLine("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
-                
+                ParseFileLink(website, serverId);
+                Console.WriteLine(ParseFileLink(website, serverId));
                 // client.DownloadFileTaskAsync()
             }
         }
-        
+
+        private static string ParseFileLink(string website, string server)
+        {
+            
+            //Verifying that the file exists
+            var regex = "File does not exist on this server";
+            var match1 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+            regex = "File has expired and does not exist anymore on this server";
+            var match2 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+            if (match1.Success || match2.Success)
+            {
+                // Console.WriteLine("File doesn't exist!");
+                return ("File doesn't exist!");
+            }
+
+            // extracting the line of JS that is used to generate the file link 
+            var pattern_elements =
+                @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
+            string matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
+
+            Console.WriteLine(matchedString);
+
+            //Parsing the numbers out of the string
+            List<int> nums = new List<int>();
+            foreach (Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()), "(\\d+)")){
+                nums.Add(int.Parse(match.ToString()));
+            }
+
+            var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
+            var fileName = Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString();
+            var fileNumber = nums[0] % nums[1] + nums[2] + nums[3];
+            // Console.WriteLine("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+            return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+        }
+
         public static void Downloadfile(string fileUrl) {
             #region validInputVerification
             //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
