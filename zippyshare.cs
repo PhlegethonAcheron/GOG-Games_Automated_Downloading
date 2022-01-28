@@ -68,11 +68,12 @@ namespace GG_Downloader
 
             // I believe this is breaking the thing up into the first bit and the unique ID
             var server = m.Groups[1].Captures[0].Value;
-            var fileID = m.Groups[2].Captures[0].Value;
-            
-            Console.WriteLine("Server: " + server + "\nFileID: " + fileID);
-            
-            using (var client = new WebClientEx())
+            var fid = m.Groups[2].Captures[0].Value;
+            string matchedString;
+            Console.WriteLine("Server: " + server + "\nFileID: " + fid);
+
+            //Gets the Matched string that contains all the info needed to assemble the link
+            using (var client = new WebClientEx()) 
             {
                 var website = client.DownloadString(fileUrl);
 
@@ -89,14 +90,18 @@ namespace GG_Downloader
                 }
 
                 #endregion
-                
-                var pattern_elements = @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
-                var matchString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
-                Console.WriteLine(matchString);
-                var quoteMatches = Regex.Matches(matchString)
-                
-                
+
+                var pattern_elements =
+                    @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
+                matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
             }
+
+            Console.WriteLine(matchedString);
+            var fileID = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
+            var fileNumber = Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString();
+            var fileName = Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString();
+            Console.WriteLine("https://" + server + ".zippyshare.com" + fileID + fileNumber + fileName);
+            
         }
         
         public static void Downloadfile(string fileUrl) {
