@@ -90,11 +90,12 @@ namespace GG_Downloader
             using (var client = new System.Net.WebClient())
             {
                 var website = client.DownloadString(fileUrl);
-
-                string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                
                 string fileLink = ParseFileLink(website, serverId);
-                string fileName = Regex.Replace(Regex.Replace(Regex.Match(fileLink, "game(.*)\\.rar").ToString(), "%28", "("), "%29", ")");  
-                var outputDir = Path.Combine(sCurrentDirectory, @"..\GameName\");
+                string fileName = Regex.Replace(Regex.Replace(Regex.Match(fileLink, "game(.*)\\.rar").ToString(), "%28", "("), "%29", ")");
+                var outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
+                    (Regex.Match(fileName, "(?<=-)(.*)(?=-)").ToString()) + "\\");
+                
                 Directory.CreateDirectory(outputDir);
                 Console.WriteLine("Starting download of " + fileLink);
                 client.DownloadFile(fileLink,  outputDir + fileName);
