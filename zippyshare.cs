@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -10,14 +11,14 @@ namespace GG_Downloader
         public WebClientEx()
         {
         }
-
+    
         public WebClientEx(CookieContainer container)
         {
             this.CookieContainer = container;
         }
-
+    
         public CookieContainer CookieContainer { get; set; } = new CookieContainer();
-
+    
         protected override WebRequest GetWebRequest(Uri address)
         {
             var r = base.GetWebRequest(address);
@@ -25,21 +26,21 @@ namespace GG_Downloader
             if (request != null) request.CookieContainer = CookieContainer;
             return r;
         }
-
+    
         protected override WebResponse GetWebResponse(WebRequest request, IAsyncResult result)
         {
             var response = base.GetWebResponse(request, result);
             ReadCookies(response);
             return response;
         }
-
+    
         protected override WebResponse GetWebResponse(WebRequest request)
         {
             var response = base.GetWebResponse(request);
             ReadCookies(response);
             return response;
         }
-
+    
         private void ReadCookies(WebResponse r)
         {
             var response = r as HttpWebResponse;
@@ -68,8 +69,7 @@ namespace GG_Downloader
                 }
             }
         }
-        
-        // public static void ()
+
         public static void GetFileLink(string fileUrl){
             
             #region validInputVerification
@@ -87,12 +87,18 @@ namespace GG_Downloader
             var serverId = m.Groups[1].Captures[0].Value;
 
             //Gets the Matched string that contains all the info needed to assemble the link
-            using (var client = new WebClientEx())
+            using (var client = new System.Net.WebClient())
             {
                 var website = client.DownloadString(fileUrl);
-                ParseFileLink(website, serverId);
-                Console.WriteLine(ParseFileLink(website, serverId));
-                // client.DownloadFileTaskAsync()
+
+                string sCurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+                string fileLink = ParseFileLink(website, serverId);
+                string fileName = Regex.Replace(Regex.Replace(Regex.Match(fileLink, "game(.*)\\.rar").ToString(), "%28", "("), "%29", ")");  
+                var outputDir = Path.Combine(sCurrentDirectory, @"..\GameName\");
+                Directory.CreateDirectory(outputDir);
+                Console.WriteLine("Starting download of " + fileLink);
+                client.DownloadFile(fileLink,  outputDir + fileName);
+                Console.WriteLine("Completed Download of " + fileLink + "\nFile can be found in " + outputDir);
             }
         }
 
@@ -115,18 +121,19 @@ namespace GG_Downloader
                 @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
             string matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
 
-            Console.WriteLine(matchedString);
+            // Console.WriteLine(matchedString);
 
             //Parsing the numbers out of the string
             List<int> nums = new List<int>();
             foreach (Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()), "(\\d+)")){
                 nums.Add(int.Parse(match.ToString()));
             }
-
+            
             var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
-            var fileName = Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString();
-            var fileNumber = nums[0] % nums[1] + nums[2] + nums[3];
-            // Console.WriteLine("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+            
+            var fileName = (Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString());
+          
+            var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
             return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
         }
 
