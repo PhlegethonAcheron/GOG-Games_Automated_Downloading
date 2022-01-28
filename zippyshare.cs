@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 
@@ -53,6 +54,22 @@ namespace GG_Downloader
     public class Zippyshare
     {
 
+        public static void PrintRegexMatches(Match m)
+        {
+            for (int i = 1; i <= 2; i++)
+            {
+                Group g = m.Groups[i];
+                Console.WriteLine("Group"+i+"='" + g + "'");
+                CaptureCollection cc = g.Captures;
+                for (int j = 0; j < cc.Count; j++)
+                {
+                    Capture c = cc[j];
+                    Console.WriteLine("Capture"+j+"='" + c + "', Position="+c.Index);
+                }
+            }
+        }
+        
+        // public static void ()
         public static void GetFileLink(string fileUrl){
             
             #region validInputVerification
@@ -73,17 +90,16 @@ namespace GG_Downloader
             Console.WriteLine("Server: " + server + "\nFileID: " + fid);
 
             //Gets the Matched string that contains all the info needed to assemble the link
-            using (var client = new WebClientEx()) 
-            {
+            using (var client = new WebClientEx()){
                 var website = client.DownloadString(fileUrl);
 
                 #region FileExistenceVerification
 
                 var regex = "File does not exist on this server";
-                var match = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+                var match1 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
                 regex = "File has expired and does not exist anymore on this server";
                 var match2 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
-                if (match.Success || match2.Success)
+                if (match1.Success || match2.Success)
                 {
                     Console.WriteLine("File doesn't exist!");
                     return;
@@ -94,14 +110,22 @@ namespace GG_Downloader
                 var pattern_elements =
                     @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
                 matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
-            }
-
-            Console.WriteLine(matchedString);
-            var fileID = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
-            var fileNumber = Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString();
-            var fileName = Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString();
-            Console.WriteLine("https://" + server + ".zippyshare.com" + fileID + fileNumber + fileName);
             
+                Console.WriteLine(matchedString);
+                
+                //Parsing the numbers out of the string
+                List<int> nums = new List<int>();
+                foreach(Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()), "(\\d+)")){
+                    nums.Add(int.Parse(match.ToString()));
+                }
+                
+                var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
+                var fileName = Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString();
+                var fileNumber = nums[0] % nums[1] + nums[2] + nums[3];
+                Console.WriteLine("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+                
+                // client.DownloadFileTaskAsync()
+            }
         }
         
         public static void Downloadfile(string fileUrl) {
