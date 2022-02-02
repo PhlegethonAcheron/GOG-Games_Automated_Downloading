@@ -21,8 +21,10 @@ namespace GG_Downloader
             // https://www17.zippyshare.com/v/j3Ezawz5/file.html
             // https://www101.zippyshare.com/v/SLrsee4W/file.html
             
-            Console.WriteLine("First Link: " + "https://www17.zippyshare.com/v/j3Ezawz5/file.html");
-            Zippyshare.GetFileLink("https://www17.zippyshare.com/v/j3Ezawz5/file.html");
+            
+            
+            // Console.WriteLine("First Link: " + "https://www17.zippyshare.com/v/j3Ezawz5/file.html");
+            // LinkRetriever.DownloadFile("https://www17.zippyshare.com/v/j3Ezawz5/file.html");
   
             // IList<string> links = link_getter("https://gog-games.com/game/mule");
             // foreach(string e in links) {
@@ -37,7 +39,6 @@ namespace GG_Downloader
             Quit();
         }
         
-       
         
         public static IList<string> link_getter(string inputUrl)
         {
@@ -66,11 +67,6 @@ namespace GG_Downloader
             return foundFilteredLinks;
         } //input: gog-games url; output: zippy page URLS
         
-        // public static string file_url_getter(string rawPageLink)
-        // {
-        //     //validate link input; seems good to do, although in theory this method should never get invalid inputs)
-        //     
-        // }
 
         private static void Quit()
         {
@@ -84,3 +80,34 @@ namespace GG_Downloader
         }
     }
 }
+
+//Minimum viable Product TODOS:
+//TODO: Rewrite RegExp that extracts the file name, currently won't work on the goodies links
+//TODO: integrate link_getter into zippyshare.cs, figure out better naming scheme
+//TODO: integrate with Playnite extension
+//TODO: Use "Install" button
+//TODO: Adapt Xbox browser for this use case
+//TODO: Figure out how to get the game imported after it's been downloaded and installed. Possibly taking the shortcut that gog adds to the start menu or something?
+//TODO: Figure out metadata importing
+//TODO: Extract file on download
+//TODO: Run the installer
+//TODO: Run DLC Installers
+
+//Other TODOS: 
+//TODO: Make completely encapsulated, for easier playnite integration later on
+//TODO: Check Disk Space
+//TODO: Add way to deal with "goodies"
+
+//Multithreading TODOs:
+//TODO: Multithreading in file Download: https://stackoverflow.com/questions/9459225/asynchronous-file-download-with-progress-bar
+//Also might want to refer back to java multithreading I did for class in fall
+//TODO: Create method to handle the download threads; input: num threads, list of links
+//TODO: Look into playnite displaying status bars for downloads
+//TODO: Implement better download stats
+
+
+//Proposed Program Structure: 
+// Main recieves gg-games link, queries zippyshare.cs's zippy_link_getter to receieve list of raw links
+// List of links sent to method that deals with getting all the file links, returns file links
+// goodies links and main links sorted into two lists
+
