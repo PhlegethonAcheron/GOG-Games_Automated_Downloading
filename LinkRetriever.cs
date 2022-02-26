@@ -123,9 +123,8 @@ namespace GG_Downloader
             var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
             return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
         }
-        public static string ZippyGetFileName(string fileLink) {
-            Console.WriteLine(Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d))\\S+").ToString());
-            return (Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d)).*").ToString());
+        public static string ZippyGetFileName(string fileLink) { //Takes output of ZippyGetFileLink, returns unescaped filename
+            return Uri.UnescapeDataString(Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d\\/))\\S+").ToString());
         }
         public static IList<string> GogGetZippyLink(string inputUrl)
         {

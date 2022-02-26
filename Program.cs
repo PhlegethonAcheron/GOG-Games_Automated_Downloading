@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace GG_Downloader
 {
@@ -7,20 +7,17 @@ namespace GG_Downloader
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine(Uri.UnescapeDataString(Regex.Match("https://www17.zippyshare.com/d/j3Ezawz5/32364/game-mule-%2845107%29.rar", 
-                    "(?<=(\\d\\d\\d\\d\\d\\/))\\S+").ToString()));
+           
+            IList<string> zippyLinks = LinkRetriever.GogGetZippyLink("https://gog-games.com/game/mule");
+            foreach(string e in zippyLinks) {
+                // Console.WriteLine("Link: " + LinkRetriever.ZippyGetFileLink(e) + "\t Filename: " + LinkRetriever.ZippyGetFileName(e));
+                // Console.WriteLine("" + LinkRetriever.ZippyGetFileName(e));
+                Console.WriteLine("Link: " + LinkRetriever.ZippyGetFileLink(e));
+                Console.WriteLine("\t Filename: " + LinkRetriever.ZippyGetFileName(LinkRetriever.ZippyGetFileLink(e)));
+                
+            }
             
-            
-            // IList<string> zippyLinks = LinkRetriever.GogGetZippyLink("https://gog-games.com/game/mule");
-            // foreach(string e in zippyLinks) {
-            //     // Console.WriteLine("Link: " + LinkRetriever.ZippyGetFileLink(e) + "\t Filename: " + LinkRetriever.ZippyGetFileName(e));
-            //     // Console.WriteLine("" + LinkRetriever.ZippyGetFileName(e));
-            //     Console.WriteLine("Link: " + LinkRetriever.ZippyGetFileLink(e));
-            //     Console.WriteLine("\t Filename: " + LinkRetriever.ZippyGetFileName(e));
-            //     
-            // }
-            //
-            // Quit();
+            Quit();
         }
 
         
