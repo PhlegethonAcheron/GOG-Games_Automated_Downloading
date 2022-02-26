@@ -124,8 +124,8 @@ namespace GG_Downloader
             return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
         }
         public static string ZippyGetFileName(string fileLink) {
-            
-            return (Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d/)).*").ToString());
+            Console.WriteLine(Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d))\\S+").ToString());
+            return (Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d)).*").ToString());
         }
         public static IList<string> GogGetZippyLink(string inputUrl)
         {
@@ -156,4 +156,8 @@ namespace GG_Downloader
             return foundFilteredLinks;
         } //input: gog-games url; output: zippy page URLS
     }
-}
+ }
+ 
+// (?!\/)\S
+// (?<=(\d\d\d\d\d\/))\S+
+// (?<=(\\d\\d\\d\\d\\d)).*
