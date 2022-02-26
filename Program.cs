@@ -1,10 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using OpenQA.Selenium;
-using OpenQA.Selenium.Chrome;
-using OpenQA.Selenium.Support.UI;
-using WebDriverManager;
-using WebDriverManager.DriverConfigs.Impl;
 
 namespace GG_Downloader
 {
@@ -16,7 +11,7 @@ namespace GG_Downloader
             IList<string> zippyLinks = LinkRetriever.GogGetZippyLink("https://gog-games.com/game/mule");
             foreach(string e in zippyLinks) {
                 Console.WriteLine(LinkRetriever.ZippyGetFileLink(e));
-                Console.WriteLine(LinkRetriever.);
+                Console.WriteLine(LinkRetriever.ZippyGetFileName(e));
             }
             
             Quit();
