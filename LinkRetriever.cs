@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -13,7 +12,7 @@ namespace GG_Downloader
     public static class LinkRetriever
     {
         
-        public static void DownloadFile(string fileUrl){
+        /*public static void DownloadFile(string fileUrl){
                 
             #region validInputVerification
             //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
@@ -44,8 +43,42 @@ namespace GG_Downloader
                 client.DownloadFile(fileLink,  outputDir + fileName);
                 Console.WriteLine("Completed Download of " + fileLink + "\nFile can be found in " + outputDir);
             }
-        }
-        private static string ZippyGetFileLinkComplete(string rawZippyUrl) {
+        }*/
+        
+        /*private static string ZippyGetFileLink(string website, string server)
+      {
+          //Verifying that the file exists
+          var regex = "File does not exist on this server";
+          var match1 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+          regex = "File has expired and does not exist anymore on this server";
+          var match2 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
+          if (match1.Success || match2.Success)
+          {
+              // Console.WriteLine("File doesn't exist!");
+              return ("File doesn't exist!");
+          }
+
+          // extracting the line of JS that is used to generate the file link 
+          var pattern_elements =
+              @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
+          string matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
+
+          // Console.WriteLine(matchedString);
+
+          //Parsing the numbers out of the string
+          List<int> nums = new List<int>();
+          foreach (Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()), "(\\d+)")){
+              nums.Add(int.Parse(match.ToString()));
+          }
+          
+          var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
+          
+          var fileName = (Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString());
+        
+          var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
+          return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+      }*/
+        public static string ZippyGetFileLink(string rawZippyUrl) {
             //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
             var m = Regex.Match(rawZippyUrl, @"https?://((?:[\w\-]+))\.*zippyshare\.com/\w/(\w+)", RegexOptions.IgnoreCase);
             if (!m.Success)
@@ -90,58 +123,19 @@ namespace GG_Downloader
             var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
             return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
         }
-        private static bool IsValidZippyLink(string fileUrl) {
-            var m = Regex.Match(fileUrl, @"https?://((?:[\w\-]+))\.*zippyshare\.com/\w/(\w+)", RegexOptions.IgnoreCase);
-            if (!m.Success)
-            {
-                Console.WriteLine("Invalid zippyshare link!");
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-        private static string ZippyGetFileLink(string website, string server)
-        {
-            //Verifying that the file exists
-            var regex = "File does not exist on this server";
-            var match1 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
-            regex = "File has expired and does not exist anymore on this server";
-            var match2 = Regex.Match(website, regex, RegexOptions.IgnoreCase);
-            if (match1.Success || match2.Success)
-            {
-                // Console.WriteLine("File doesn't exist!");
-                return ("File doesn't exist!");
-            }
-
-            // extracting the line of JS that is used to generate the file link 
-            var pattern_elements =
-                @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
-            string matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
-
-            // Console.WriteLine(matchedString);
-
-            //Parsing the numbers out of the string
-            List<int> nums = new List<int>();
-            foreach (Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()), "(\\d+)")){
-                nums.Add(int.Parse(match.ToString()));
-            }
-            
-            var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
-            
-            var fileName = (Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString());
-          
-            var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
-            return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+        public static string ZippyGetFileName(string fileLink) {
+            return (Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d/)).*").ToString());
         }
         public static IList<string> GogGetZippyLink(string inputUrl)
         {
             new DriverManager().SetUpDriver(new ChromeConfig());
             var options = new ChromeOptions();
             var driver = new ChromeDriver(options);
-
+            Console.WriteLine("Started WebDriver");
             //clicking on the captcha download button
+            Console.WriteLine(inputUrl);
             driver.Navigate().GoToUrl(inputUrl);
+            
             driver.FindElement(By.CssSelector(".g-recaptcha")).Click();
             
             //waiting until the links load in, then extracting them from parent elements
