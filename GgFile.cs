@@ -1,16 +1,22 @@
 ﻿namespace GG_Downloader
 {
-    public class File {
+    public class GgFile {
         string _fileName, _sourceUrl, _hostUrl, _fileDirectUrl, _filePath;
-        public File(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath) {
+        private double _fileSize;
+        public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath, double fileSize) {
             this._fileName = fileName;
             this._sourceUrl = sourceUrl;
             this._hostUrl = hostUrl;
             this._fileDirectUrl = fileDirectUrl;
             this._filePath = filePath;
+            this._fileSize = fileSize;
         }
-        private File() {
-            
+
+        #region Getters And Setters
+
+        public double FileSize {
+            get => _fileSize;
+            set => _fileSize = value;
         }
 
         public string FileName {
@@ -37,5 +43,12 @@
             get => _filePath;
             set => _filePath = value;
         }
+
+        #endregion
+
+        // public IList<GgFile> GetFileInfoList(string inputUrl) { //Takes url, returns list of files
+        //     
+        // }
+
     }
 }

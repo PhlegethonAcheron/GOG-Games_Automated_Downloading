@@ -123,6 +123,14 @@ namespace GG_Downloader
             var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
             return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
         }
+
+        public static double ZippyGetFileSize(string rawZippyUrl) {
+            string website = new System.Net.WebClient().DownloadString(rawZippyUrl);
+                // \d+\.\d+ ((MB)|(KB))
+                string sizeAsString = Regex.Match(website, "\\d+\\.\\d+ ((MB)|(KB))").ToString();
+                double sizeInMBytes = Double.Parse(Regex.Match(sizeAsString,"\\d+\\.\\d+").ToString());
+                return sizeInMBytes;
+        }
         public static string ZippyGetFileName(string fileLink) { //Takes output of ZippyGetFileLink, returns unescaped filename
             return Uri.UnescapeDataString(Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d\\/))\\S+").ToString());
         }
@@ -157,6 +165,3 @@ namespace GG_Downloader
     }
  }
  
-// (?!\/)\S
-// (?<=(\d\d\d\d\d\/))\S+
-// (?<=(\\d\\d\\d\\d\\d)).*

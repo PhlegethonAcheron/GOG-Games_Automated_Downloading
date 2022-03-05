@@ -17,10 +17,11 @@ namespace GG_Downloader
                 
             }
             
+            
             Quit();
         }
-
         
+        // private static IList<GgFile> 
 
         private static void Quit()
         {
