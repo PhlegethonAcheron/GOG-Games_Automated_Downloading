@@ -1,9 +1,11 @@
 ﻿namespace GG_Downloader
 {
     public class GgFile {
+        //_sourceUrl: gog-games.com url     _hostUrl: Raw Zippy URL     _fileDirectUrl: ddl zippy url
         string _fileName, _sourceUrl, _hostUrl, _fileDirectUrl, _filePath;
         private double _fileSize;
-        public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath, double fileSize) {
+
+        public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath, double fileSize) { //full Constructor
             this._fileName = fileName;
             this._sourceUrl = sourceUrl;
             this._hostUrl = hostUrl;
@@ -15,6 +17,7 @@
         #region Getters And Setters
 
         public double FileSize {
+            //FileSize is in MB
             get => _fileSize;
             set => _fileSize = value;
         }
@@ -45,10 +48,6 @@
         }
 
         #endregion
-
-        // public IList<GgFile> GetFileInfoList(string inputUrl) { //Takes url, returns list of files
-        //     
-        // }
 
     }
 }
