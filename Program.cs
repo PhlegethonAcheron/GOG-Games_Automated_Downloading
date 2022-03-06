@@ -29,6 +29,8 @@ namespace GG_Downloader
             // ReSharper disable once NotAccessedVariable
             string ggUrl; // URL for the actual source of the game; if gog.com, converted to gog-games.com link
             switch (linkClass) {
+                case LinkRetriever.LinkType.InvalidLinkFormat:
+                    throw new ArgumentException("Given input is not a valid URL.", inputUrl);
                 case LinkRetriever.LinkType.InvalidResource:
                     throw new ArgumentException("Given input URL is not a valid link to a game.", inputUrl);
                 case LinkRetriever.LinkType.InvalidWebsite:
@@ -42,8 +44,10 @@ namespace GG_Downloader
                     ggUrl = inputUrl;
                     break;
             } //dealing with the different potential URL inputs
-            // todo: continue with the creation of the file objects
-            // todo: consider how I might implement the downloading of multiple games; potentially creating an object out of a game?
+
+            
+            
+
             
         }
         private static void Quit()
@@ -58,3 +62,6 @@ namespace GG_Downloader
         }
     }
 }
+// todo: consider how I might implement the downloading of multiple games; potentially creating an object out of a game?
+// todo: make folder and downloads be at %homepath%\Saved Games\Gog_Downloader\<GameName> by default
+// todo: dirs for extras, downloads(temp), game

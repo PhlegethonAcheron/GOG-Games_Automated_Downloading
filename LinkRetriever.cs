@@ -112,7 +112,8 @@ namespace GG_Downloader
             Gog,
             GogGames,
             InvalidResource, //used when it isn't a .../game/
-            InvalidWebsite
+            InvalidWebsite,
+            InvalidLinkFormat
         } //used to return types of links
 
         public static LinkType ValidateInputLink(string inputLink) {
@@ -122,8 +123,13 @@ namespace GG_Downloader
                     currentValidityState = inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog;
                 else
                     currentValidityState = LinkType.InvalidResource;
-            else
+            if (Regex.IsMatch(inputLink, "^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*\\[0-9a-zA-Z])*(:(0-9)*)*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\+&%\\$#_]*)?$")) {
                 currentValidityState = LinkType.InvalidWebsite;
+            }
+            else {
+                currentValidityState = LinkType.InvalidLinkFormat;
+            }
+
             return currentValidityState;
 
             //Experimental conditional minimal method
