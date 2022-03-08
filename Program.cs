@@ -70,7 +70,7 @@ namespace GG_Downloader
         /// </summary>
         private static void ParseFilePath(string inputPath) {
             // Check that the input is actually a path
-            if (!Regex.IsMatch (inputPath, @"^(?:[a-zA-Z]\:|\\\\[\w\.]+\\[\w.$]+)\\(?:[\w]+\\)*\w([\w.])+$")) {
+            if (!Regex.IsMatch (inputPath, @"^(?:([\w]\:)|(%.*%))(\\[a-z_\-\s0-9\.]+)+")) {
                 throw new ArgumentException("Input is not a valid path", inputPath);
             }
 
