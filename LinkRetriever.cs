@@ -125,19 +125,12 @@ namespace GG_Downloader
                     currentValidityState = LinkType.InvalidResource;
             if (Regex.IsMatch(inputLink, "^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*\\[0-9a-zA-Z])*(:(0-9)*)*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\+&%\\$#_]*)?$")) {
                 currentValidityState = LinkType.InvalidWebsite;
-            }
+            }   // todo: find the original regex used here, replace it with @, since I probably screwed up with the escaping somewhere
             else {
                 currentValidityState = LinkType.InvalidLinkFormat;
             }
 
             return currentValidityState;
-
-            //Experimental conditional minimal method
-            /*return Regex.IsMatch(inputLink, "(gog-games|gog)")
-                ? Regex.IsMatch(inputLink, "https:\\/\\/www\\.(gog-games|gog)\\.com\\/game\\/\\w+")
-                    ? inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog
-                    : LinkType.InvalidResource
-                : LinkType.InvalidWebsite;*/
         }
 
         public static string GogLinkConversion(string gogLink) {
