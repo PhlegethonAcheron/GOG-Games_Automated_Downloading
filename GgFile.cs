@@ -4,10 +4,13 @@ namespace GG_Downloader
 {
     public class GgFile {
         //_sourceUrl: OG URL input | _hostUrl: Raw Zippy URL | _fileDirectUrl: ddl zippy url
-        public string _fileName, _sourceUrl, _hostUrl, _fileDirectUrl, _filePath;
-        private double _fileSize;
-        
-        
+        private string FileName { get; }
+        private string SourceUrl { get; }
+        private string HostUrl { get; }
+        private string FileDirectUrl { get; }
+        protected internal string FilePath { get; set; }
+        private double FileSize { get; }
+
 
         public override string ToString() {
             StringBuilder toStringBuilder = new StringBuilder();
@@ -15,61 +18,20 @@ namespace GG_Downloader
         }
 
         public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath, double fileSize) { //full Constructor
-            this._fileName = fileName;
-            this._sourceUrl = sourceUrl;
-            this._hostUrl = hostUrl;
-            this._fileDirectUrl = fileDirectUrl;
-            this._filePath = filePath;
-            this._fileSize = fileSize;
+            this.FileName = fileName;
+            this.SourceUrl = sourceUrl;
+            this.HostUrl = hostUrl;
+            this.FileDirectUrl = fileDirectUrl;
+            this.FilePath = filePath;
+            this.FileSize = fileSize;
         }
         
         public GgFile(string sourceUrl, string hostUrl) {
-            this._sourceUrl = sourceUrl;
-            this._hostUrl = hostUrl;
-            this._fileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
-            this._fileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
-            this._fileName = LinkRetriever.ZippyGetFileName(hostUrl);
-        } //this constructor is only missing the filePath;
-          //Delaying the filepath until I get some form of settings working
-
-        
-        #region Getters And Setters
-
-        public string GetFileName() {
-            return this._fileName;
+            this.SourceUrl = sourceUrl;
+            this.HostUrl = hostUrl;
+            this.FileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
+            this.FileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
+            this.FileName = LinkRetriever.ZippyGetFileName(hostUrl);
         }
-        public double FileSize {
-            //FileSize is in MB
-            get => this._fileSize;
-            set => this._fileSize = value;
-        }
-
-        public string FileName {
-            get => _fileName;
-            set => _fileName = value;
-        }
-
-        public string SourceUrl {
-            get => _sourceUrl;
-            set => _sourceUrl = value;
-        }
-
-        public string HostUrl {
-            get => _hostUrl;
-            set => _hostUrl = value;
-        }
-
-        public string FileDirectUrl {
-            get => _fileDirectUrl;
-            set => _fileDirectUrl = value;
-        }
-
-        public string FilePath {
-            get => _filePath;
-            set => _filePath = value;
-        }
-
-        #endregion
-
     }
 }

@@ -62,6 +62,8 @@ namespace GG_Downloader
             while (keyPress.Key != ConsoleKey.Enter) keyPress = Console.ReadKey(intercept: true);
         }
 
+        #region Creating File Path
+
         /// <summary>
         /// Method <c>ParseFilePath()</c> takes an input path as string, throws exception if the drive specified does not exist.
         /// Creates all directories required to make the full path exist.
@@ -93,6 +95,8 @@ namespace GG_Downloader
                 }
             }
         }
+
+        #endregion
         
     }
 }
