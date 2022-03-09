@@ -1,13 +1,13 @@
-﻿using System;
-using System.Text;
-using System.Text.RegularExpressions;
+﻿using System.Text;
 
 namespace GG_Downloader
 {
     public class GgFile {
         //_sourceUrl: OG URL input | _hostUrl: Raw Zippy URL | _fileDirectUrl: ddl zippy url
-        string _fileName, _sourceUrl, _hostUrl, _fileDirectUrl, _filePath;
+        public string _fileName, _sourceUrl, _hostUrl, _fileDirectUrl, _filePath;
         private double _fileSize;
+        
+        
 
         public override string ToString() {
             StringBuilder toStringBuilder = new StringBuilder();
@@ -32,22 +32,16 @@ namespace GG_Downloader
         } //this constructor is only missing the filePath;
           //Delaying the filepath until I get some form of settings working
 
-          public void InitDirStructure(string baseDirAsEnvVar) {
-              string absBaseDir = "dummy Text, because taking a different approach";
-              if (Regex.IsMatch(baseDirAsEnvVar, @"(?<=%).*(?=%)")) {
-                  absBaseDir = Environment.GetEnvironmentVariable(
-                      Regex.Match(baseDirAsEnvVar, @"(?<=%).*(?=%)").ToString());
-              }
-              // absBaseDir = (Regex.IsMatch(baseDirAsEnvVar, @"(?<=%).*(?=%)")) ? String.Format("%s")
-              // absBaseDir = $"{}"
-          }
         
         #region Getters And Setters
 
+        public string GetFileName() {
+            return this._fileName;
+        }
         public double FileSize {
             //FileSize is in MB
-            get => _fileSize;
-            set => _fileSize = value;
+            get => this._fileSize;
+            set => this._fileSize = value;
         }
 
         public string FileName {

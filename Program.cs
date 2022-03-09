@@ -25,7 +25,7 @@ namespace GG_Downloader
         }
 
         
-        public static void GetFileInfoList(string inputUrl){ //Takes url, returns list of files
+        public static IList<GgFile> GetFileInfoList(string inputUrl){ //Takes url, returns list of files
             LinkRetriever.LinkType linkClass = LinkRetriever.ValidateInputLink(inputUrl);
             // ReSharper disable once NotAccessedVariable
             string ggUrl; // URL for the actual source of the game; if gog.com, converted to gog-games.com link
@@ -45,21 +45,21 @@ namespace GG_Downloader
                     ggUrl = inputUrl;
                     break;
             } //dealing with the different potential URL inputs
+            
             var zippyLinks = LinkRetriever.GogGetZippyLink("https://gog-games.com/game/mule");
             IList<GgFile> ggFiles = zippyLinks.Select(zippyUrl => new GgFile(inputUrl, zippyUrl)).ToList();
-            // foreach (GgFile ggFile in ggFiles) {
-            // todo: set base dir for each file to be downloaded     
-            // } 
+            ParseFilePath($"{_basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}");
+            foreach (GgFile ggFile in ggFiles) {
+                ggFile.FilePath = $"{_basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}";
+            }
+            return ggFiles;
         }
         private static void Quit()
         {
             Console.WriteLine("Done\nPress ENTER to Exit");
 
             ConsoleKeyInfo keyPress = Console.ReadKey(intercept: true);
-            while (keyPress.Key != ConsoleKey.Enter)
-            {
-                keyPress = Console.ReadKey(intercept: true);
-            }
+            while (keyPress.Key != ConsoleKey.Enter) keyPress = Console.ReadKey(intercept: true);
         }
 
         /// <summary>
@@ -84,17 +84,16 @@ namespace GG_Downloader
             StringBuilder pathBuilder = new StringBuilder();
             foreach (string pathSubString in splitPath) {
                 pathBuilder.Append(pathSubString).Append(@"\");
-                if (!Directory.Exists(pathBuilder.ToString())) {
-                    if (pathSubString.Contains(":")) {
-                        throw new ArgumentException("Specified Drive letter does not exist", pathBuilder.ToString());
-                    }
-                    else {
-                        Directory.CreateDirectory(pathBuilder.ToString());
-                    }
-                    
+                if (Directory.Exists(pathBuilder.ToString())) continue;
+                if (!pathSubString.Contains(":")) {
+                    Directory.CreateDirectory(pathBuilder.ToString());
+                }
+                else {
+                    throw new ArgumentException("Specified Drive letter does not exist", pathBuilder.ToString());
                 }
             }
         }
+        
     }
 }
 
