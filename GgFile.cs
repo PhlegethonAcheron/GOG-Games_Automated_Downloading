@@ -1,8 +1,25 @@
 ﻿using System.Text;
 
-namespace GG_Downloader
-{
+namespace GG_Downloader {
     public class GgFile {
+        public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath,
+            double fileSize) { //full Constructor
+            FileName = fileName;
+            SourceUrl = sourceUrl;
+            HostUrl = hostUrl;
+            FileDirectUrl = fileDirectUrl;
+            FilePath = filePath;
+            FileSize = fileSize;
+        }
+
+        public GgFile(string sourceUrl, string hostUrl) {
+            SourceUrl = sourceUrl;
+            HostUrl = hostUrl;
+            FileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
+            FileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
+            FileName = LinkRetriever.ZippyGetFileName(hostUrl);
+        }
+
         //_sourceUrl: OG URL input | _hostUrl: Raw Zippy URL | _fileDirectUrl: ddl zippy url
         private string FileName { get; }
         private string SourceUrl { get; }
@@ -17,21 +34,6 @@ namespace GG_Downloader
             return toStringBuilder.ToString();
         }
 
-        public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath, double fileSize) { //full Constructor
-            this.FileName = fileName;
-            this.SourceUrl = sourceUrl;
-            this.HostUrl = hostUrl;
-            this.FileDirectUrl = fileDirectUrl;
-            this.FilePath = filePath;
-            this.FileSize = fileSize;
-        }
-        
-        public GgFile(string sourceUrl, string hostUrl) {
-            this.SourceUrl = sourceUrl;
-            this.HostUrl = hostUrl;
-            this.FileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
-            this.FileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
-            this.FileName = LinkRetriever.ZippyGetFileName(hostUrl);
-        }
+        // todo: create @override toString method for GgFile
     }
 }
