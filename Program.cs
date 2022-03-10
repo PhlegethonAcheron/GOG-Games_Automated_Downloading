@@ -42,7 +42,7 @@ namespace GG_Downloader
             
             var zippyLinks = LinkRetriever.GogGetZippyLink(ggUrl);
             IList<GgFile> ggFiles = zippyLinks.Select(zippyUrl => new GgFile(inputUrl, zippyUrl)).ToList();
-            ParseFilePath($"{Basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}");
+            ParseFilePath($"{Basedir}{@"\"}{Regex.Match(@"[^\/]+$", inputUrl)}");
             foreach (GgFile ggFile in ggFiles) {
                 ggFile.FilePath = $"{Basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}";
             }
@@ -66,7 +66,7 @@ namespace GG_Downloader
         /// </summary>
         private static void ParseFilePath(string inputPath) {
             // Check that the input is actually a path
-            if (!Regex.IsMatch (inputPath, @"^(?:([\w]\:)|(%.*%))(\\[a-z_\-\s0-9\.]+)+")) {
+            if (!Regex.IsMatch (inputPath, @"(([A-Z]\:)|(%[A-z]+%))(\\[A-z_\-\s0-9\.\\]+)+")) {
                 throw new ArgumentException("Input is not a valid path", inputPath);
             }
 

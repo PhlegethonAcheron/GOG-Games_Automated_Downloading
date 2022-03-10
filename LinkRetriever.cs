@@ -109,6 +109,7 @@ namespace GG_Downloader {
 
         private static bool IsGgPageFound(string ggUrl) {
             // string website = new WebClient().DownloadString(ggUrl);
+            
             return new WebClient().DownloadString(ggUrl).Contains("404 - Good Old Downloads");
         } //checks if the gg page exists
 
