@@ -97,7 +97,3 @@ namespace GG_Downloader
         
     }
 }
-
-
-// todo: make folder and downloads be at %homepath%\Saved Games\Gog_Downloader\<GameName> by default
-// todo: settings file, cli args
