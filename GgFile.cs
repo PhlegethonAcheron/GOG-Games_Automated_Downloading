@@ -33,7 +33,5 @@ namespace GG_Downloader {
             StringBuilder toStringBuilder = new StringBuilder();
             return toStringBuilder.ToString();
         }
-
-        // todo: create @override toString method for GgFile
     }
 }

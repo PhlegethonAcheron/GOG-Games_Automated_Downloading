@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Runtime.Remoting;
 using System.Text.RegularExpressions;
 using OpenQA.Selenium;
@@ -8,9 +9,16 @@ using OpenQA.Selenium.Support.UI;
 using WebDriverManager;
 using WebDriverManager.DriverConfigs.Impl;
 
-namespace GG_Downloader
-{
+namespace GG_Downloader {
     public static class LinkRetriever {
+        public enum LinkType {
+            Gog,
+            GogGames,
+            InvalidResource, //used when it isn't a .../game/ URL
+            InvalidWebsite, //Not one of the accepted link formats
+            InvalidLinkFormat
+        } //used to return types of links
+
         public static string ZippyGetFileLink(string rawZippyUrl) {
             //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
             var m = Regex.Match(rawZippyUrl, @"https?://((?:[\w\-]+))\.*zippyshare\.com/\w/(\w+)",
@@ -23,7 +31,7 @@ namespace GG_Downloader
             var server = m.Groups[1].Captures[0].Value;
 
             //Gets the Matched string that contains all the info needed to assemble the link
-            string website = new System.Net.WebClient().DownloadString(rawZippyUrl);
+            string website = new WebClient().DownloadString(rawZippyUrl);
 
             //Verifying that the file exists
             var regex = "File does not exist on this server";
@@ -58,7 +66,7 @@ namespace GG_Downloader
         }
 
         public static double ZippyGetFileSize(string rawZippyUrl) {
-            string website = new System.Net.WebClient().DownloadString(rawZippyUrl);
+            string website = new WebClient().DownloadString(rawZippyUrl);
             // \d+\.\d+ ((MB)|(KB))
             string sizeAsString = Regex.Match(website, "\\d+\\.\\d+ ((MB)|(KB))").ToString();
             double sizeInMBytes = Double.Parse(Regex.Match(sizeAsString, "\\d+\\.\\d+").ToString());
@@ -99,7 +107,7 @@ namespace GG_Downloader
         } //input: gog-games url; output: zippy page URLS
 
         public static bool IsGgPageFound(string ggUrl) {
-            string website = new System.Net.WebClient().DownloadString(ggUrl);
+            string website = new WebClient().DownloadString(ggUrl);
             if (website.Contains("404 - Good Old Downloads")) {
                 return true;
             }
@@ -107,27 +115,25 @@ namespace GG_Downloader
                 return false;
             }
         } //checks if the gg page exists
-        
-        public enum LinkType {
-            Gog,
-            GogGames,
-            InvalidResource, //used when it isn't a .../game/
-            InvalidWebsite,
-            InvalidLinkFormat
-        } //used to return types of links
 
         public static LinkType ValidateInputLink(string inputLink) {
             LinkType currentValidityState;
-            if (Regex.IsMatch(inputLink, "(gog-games|gog)"))
-                if (Regex.IsMatch(inputLink, "https:\\/\\/www\\.(gog-games|gog)\\.com\\/game\\/\\w+"))
-                    currentValidityState = inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog;
-                else
-                    currentValidityState = LinkType.InvalidResource;
-            if (Regex.IsMatch(inputLink, "^(ht|f)tp(s?)\\:\\/\\/[0-9a-zA-Z]([-.\\w]*\\[0-9a-zA-Z])*(:(0-9)*)*(\\/?)([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\+&%\\$#_]*)?$")) {
-                currentValidityState = LinkType.InvalidWebsite;
-            }   // todo: find the original regex used here, replace it with @, since I probably screwed up with the escaping somewhere
-            else {
-                currentValidityState = LinkType.InvalidLinkFormat;
+            switch (Regex.IsMatch(inputLink, "(gog-games|gog)")) {
+                case false when Regex.IsMatch(inputLink,
+                        @"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?$")
+                    :
+                    currentValidityState = LinkType.InvalidWebsite;
+                    break;
+                case false:
+                    currentValidityState = LinkType.InvalidLinkFormat;
+                    break;
+                default: {
+                    currentValidityState =
+                        Regex.IsMatch(inputLink, "https:\\/\\/www\\.(gog-games|gog)\\.com\\/game\\/\\w+")
+                            ? inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog
+                            : LinkType.InvalidResource;
+                    break;
+                }
             }
 
             return currentValidityState;
@@ -138,9 +144,8 @@ namespace GG_Downloader
             if (!IsGgPageFound(gogGamesLink)) {
                 throw new ServerException("Gog-games page returned 404. Requested URL: " + gogGamesLink);
             }
+
             return gogGamesLink;
-            //in the future
         }
     }
 }
- 
