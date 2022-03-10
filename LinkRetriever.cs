@@ -13,6 +13,7 @@ namespace GG_Downloader {
     public static class LinkRetriever {
         public enum LinkType {
             Gog,
+            GogLocalized,
             GogGames,
             InvalidResource, //used when it isn't a .../game/ URL
             InvalidWebsite, //Not one of the accepted link formats
@@ -118,34 +119,33 @@ namespace GG_Downloader {
 
         public static LinkType ValidateInputLink(string inputLink) {
             LinkType currentValidityState;
-            switch (Regex.IsMatch(inputLink, "(gog-games|gog)")) {
-                case false when Regex.IsMatch(inputLink,
-                        @"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?$")
-                    :
-                    currentValidityState = LinkType.InvalidWebsite;
-                    break;
-                case false:
-                    currentValidityState = LinkType.InvalidLinkFormat;
-                    break;
-                default: {
-                    currentValidityState =
-                        Regex.IsMatch(inputLink, "https:\\/\\/www\\.(gog-games|gog)\\.com\\/game\\/\\w+")
-                            ? inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog
-                            : LinkType.InvalidResource;
-                    break;
-                }
+            if (!Regex.IsMatch(inputLink, @"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?$")) {
+                currentValidityState = LinkType.InvalidLinkFormat;
             }
-
+            else if (!Regex.IsMatch(inputLink, "(gog-games|gog)")) {
+                currentValidityState = LinkType.InvalidWebsite;
+            }
+            else if (Regex.IsMatch(inputLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/\w+")) {
+                currentValidityState = LinkType.GogLocalized;
+            } 
+            else if (Regex.IsMatch(inputLink, @"https:\/\/www\.(gog-games|gog)\.com\/game\/\w+")) {
+                currentValidityState = inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog;
+            }
+            else {
+                currentValidityState = LinkType.InvalidResource;
+            }
+            
             return currentValidityState;
         }
 
         public static string GogLinkConversion(string gogLink) {
-            string gogGamesLink = gogLink.Replace("https://gog.com", "https://gog-games.com");
-            if (!IsGgPageFound(gogGamesLink)) {
-                throw new ServerException("Gog-games page returned 404. Requested URL: " + gogGamesLink);
-            }
-
-            return gogGamesLink;
+            string gogGamesLink = Regex.IsMatch(gogLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/\w+")
+                ? Regex.Replace(gogLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/",
+                    @"https:\/\/www\.gog-games\.com\/game\/")
+                : gogLink.Replace("https://gog.com", "https://gog-games.com");
+            return !IsGgPageFound(gogGamesLink)
+                ? throw new ServerException("Gog-games page returned 404. Requested URL: " + gogGamesLink)
+                : gogGamesLink;
         }
     }
 }

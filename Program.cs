@@ -102,10 +102,5 @@ namespace GG_Downloader
 }
 
 
-// todo: make list of GgFiles given a GG/GOG URL
-
-// todo: consider how I might implement the downloading of multiple games; potentially creating an object out of a game?
 // todo: make folder and downloads be at %homepath%\Saved Games\Gog_Downloader\<GameName> by default
-// todo: dirs for extras, downloads(temp), game
 // todo: settings file, cli args
-// todo: download manager
