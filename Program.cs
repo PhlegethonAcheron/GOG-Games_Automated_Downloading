@@ -8,26 +8,17 @@ using System.Text.RegularExpressions;
 namespace GG_Downloader
 {
     public static class Program {
-        private static string _basedir = @"%homepath%\Saved Games\Gog_Downloader\"; // todo: make this a field in the settings file
-        public static void Main(string[] args)
-        {
-          // todo: CLI Input  
-            IList<string> zippyLinks = LinkRetriever.GogGetZippyLink("https://gog-games.com/game/mule");
-            foreach(string e in zippyLinks) {
-                // Console.WriteLine("Link: " + LinkRetriever.ZippyGetFileLink(e) + "\t Filename: " + LinkRetriever.ZippyGetFileName(e));
-                // Console.WriteLine("" + LinkRetriever.ZippyGetFileName(e));
-                Console.WriteLine("Link: " + LinkRetriever.ZippyGetFileLink(e));
-                Console.WriteLine("Filename: " + LinkRetriever.ZippyGetFileName(LinkRetriever.ZippyGetFileLink(e)) +
-                                  "\tSize: " + LinkRetriever.ZippyGetFileSize(e) + " MB");
-            }
+        private const string Basedir = @"%homepath%\Saved Games\Gog_Downloader\"; // todo: make this a field in the settings file
 
+        public static void Main()
+        {
+            Console.WriteLine("Enter gog URL:");
+            var ggFileList = GetFileInfoList(Console.ReadLine());
+            ggFileList.ToList().ForEach(Console.WriteLine);
             Quit();
         }
-
-        
-        public static IList<GgFile> GetFileInfoList(string inputUrl){ //Takes url, returns list of files
+        private static IEnumerable<GgFile> GetFileInfoList(string inputUrl){ //Takes url, returns list of files
             LinkRetriever.LinkType linkClass = LinkRetriever.ValidateInputLink(inputUrl);
-            // ReSharper disable once NotAccessedVariable
             string ggUrl; // URL for the actual source of the game; if gog.com, converted to gog-games.com link
             switch (linkClass) {
                 case LinkRetriever.LinkType.InvalidLinkFormat:
@@ -37,20 +28,23 @@ namespace GG_Downloader
                 case LinkRetriever.LinkType.InvalidWebsite:
                     throw new ArgumentException("Given input is not a valid website. Valid websites are: \"gog-games.com\" and \"gog.com\".", inputUrl);
                 case LinkRetriever.LinkType.Gog:
-                    // ReSharper disable once RedundantAssignment
                     ggUrl = LinkRetriever.GogLinkConversion(inputUrl);
                     break;
                 case LinkRetriever.LinkType.GogGames:
-                    // ReSharper disable once RedundantAssignment
                     ggUrl = inputUrl;
                     break;
+                case LinkRetriever.LinkType.GogLocalized:
+                    ggUrl = LinkRetriever.GogLinkConversion(inputUrl);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             } //dealing with the different potential URL inputs
             
-            var zippyLinks = LinkRetriever.GogGetZippyLink("https://gog-games.com/game/mule");
+            var zippyLinks = LinkRetriever.GogGetZippyLink(ggUrl);
             IList<GgFile> ggFiles = zippyLinks.Select(zippyUrl => new GgFile(inputUrl, zippyUrl)).ToList();
-            ParseFilePath($"{_basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}");
+            ParseFilePath($"{Basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}");
             foreach (GgFile ggFile in ggFiles) {
-                ggFile.FilePath = $"{_basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}";
+                ggFile.FilePath = $"{Basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}";
             }
             return ggFiles;
         }
@@ -58,7 +52,7 @@ namespace GG_Downloader
         {
             Console.WriteLine("Done\nPress ENTER to Exit");
 
-            ConsoleKeyInfo keyPress = Console.ReadKey(intercept: true);
+            ConsoleKeyInfo keyPress = Console.ReadKey(true);
             while (keyPress.Key != ConsoleKey.Enter) keyPress = Console.ReadKey(intercept: true);
         }
 

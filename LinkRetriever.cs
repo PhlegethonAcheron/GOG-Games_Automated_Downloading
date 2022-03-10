@@ -107,14 +107,9 @@ namespace GG_Downloader {
             return foundFilteredLinks;
         } //input: gog-games url; output: zippy page URLS
 
-        public static bool IsGgPageFound(string ggUrl) {
-            string website = new WebClient().DownloadString(ggUrl);
-            if (website.Contains("404 - Good Old Downloads")) {
-                return true;
-            }
-            else {
-                return false;
-            }
+        private static bool IsGgPageFound(string ggUrl) {
+            // string website = new WebClient().DownloadString(ggUrl);
+            return new WebClient().DownloadString(ggUrl).Contains("404 - Good Old Downloads");
         } //checks if the gg page exists
 
         public static LinkType ValidateInputLink(string inputLink) {
