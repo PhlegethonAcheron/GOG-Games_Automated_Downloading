@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using static System.String;
 
 namespace GG_Downloader
 {
@@ -12,8 +13,10 @@ namespace GG_Downloader
 
         public static void Main()
         {
-            Console.WriteLine("Enter gog URL:");
-            var ggFileList = GetFileInfoList(Console.ReadLine());
+            Console.WriteLine("Enter gog URL:\n" + "https://www.gog.com/ru/game/mule");
+            string urlInput = "https://www.gog.com/ru/game/mule";
+            // urlInput = Console.ReadLine();
+            var ggFileList = GetFileInfoList(urlInput);
             ggFileList.ToList().ForEach(Console.WriteLine);
             Quit();
         }
@@ -42,9 +45,9 @@ namespace GG_Downloader
             
             var zippyLinks = LinkRetriever.GogGetZippyLink(ggUrl);
             IList<GgFile> ggFiles = zippyLinks.Select(zippyUrl => new GgFile(inputUrl, zippyUrl)).ToList();
-            ParseFilePath($"{Basedir}{@"\"}{Regex.Match(@"[^\/]+$", inputUrl)}");
+            ParseFilePath(Format("{0}{1}{2}", Basedir, Regex.IsMatch(Basedir, @"\\$")?"":@"\", Regex.Match(@"[^\/]+$", inputUrl)));
             foreach (GgFile ggFile in ggFiles) {
-                ggFile.FilePath = $"{Basedir}{@"\"}{Regex.Match(@"[^/]+$", inputUrl)}";
+                ggFile.FilePath = $"{Basedir}{@"\"}{Regex.Match(inputUrl, @"[^\/]+$")}";
             }
             return ggFiles;
         }
@@ -70,12 +73,15 @@ namespace GG_Downloader
                 throw new ArgumentException("Input is not a valid path", inputPath);
             }
 
-            string absPath = Regex.IsMatch(inputPath, @"(?<=%).*(?=%)")
-                ? Regex.Replace("%.*%",
+            string absPath;
+            if (Regex.IsMatch(inputPath, "(?<=%).*(?=%)"))
+                
+                absPath = Regex.Replace("%.*%",
                     Environment.GetEnvironmentVariable(Regex.Match(inputPath, @"(?<=%).*(?=%)").ToString())
-                    ?? string.Empty, inputPath)
-                : inputPath;
-            
+                    ?? Empty, inputPath);
+            else
+                absPath = inputPath;
+
             string[] splitPath = absPath.Split('\\');
             StringBuilder pathBuilder = new StringBuilder();
             foreach (string pathSubString in splitPath) {
