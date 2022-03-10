@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using static System.String;
 
 namespace GG_Downloader
 {
@@ -45,9 +44,9 @@ namespace GG_Downloader
             
             var zippyLinks = LinkRetriever.GogGetZippyLink(ggUrl);
             IList<GgFile> ggFiles = zippyLinks.Select(zippyUrl => new GgFile(inputUrl, zippyUrl)).ToList();
-            ParseFilePath(Format("{0}{1}{2}", Basedir, Regex.IsMatch(Basedir, @"\\$")?"":@"\", Regex.Match(@"[^\/]+$", inputUrl)));
+            ParseFilePath($"{Basedir}{(Regex.IsMatch(Basedir, @"\\$") ? "" : @"\")}{Regex.Match(inputUrl,@"[^\/]+$")}");
             foreach (GgFile ggFile in ggFiles) {
-                ggFile.FilePath = $"{Basedir}{@"\"}{Regex.Match(inputUrl, @"[^\/]+$")}";
+                ggFile.FilePath = $"{Basedir}{(Regex.IsMatch(Basedir, @"\\$") ? "" : @"\")}{Regex.Match(inputUrl,@"[^\/]+$")}";
             }
             return ggFiles;
         }
@@ -73,14 +72,12 @@ namespace GG_Downloader
                 throw new ArgumentException("Input is not a valid path", inputPath);
             }
 
-            string absPath;
-            if (Regex.IsMatch(inputPath, "(?<=%).*(?=%)"))
-                
-                absPath = Regex.Replace("%.*%",
-                    Environment.GetEnvironmentVariable(Regex.Match(inputPath, @"(?<=%).*(?=%)").ToString())
-                    ?? Empty, inputPath);
-            else
-                absPath = inputPath;
+            var absPath = Regex.IsMatch(inputPath, "(?<=%).*(?=%)")
+                ? Regex.Replace(inputPath, @"%.*%",
+                    Environment.GetEnvironmentVariable(Regex.Match(inputPath, @"(?<=%).*(?=%)").ToString()) ??
+                    throw new ArgumentException(
+                        $"{Regex.Match(inputPath, @"(?<=%).*(?=%)")} is not a valid environment variable."))
+                : inputPath;
 
             string[] splitPath = absPath.Split('\\');
             StringBuilder pathBuilder = new StringBuilder();

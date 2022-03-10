@@ -28,9 +28,8 @@
 
 
         public override string ToString() {
-            return $"File Name: {FileName}\tFile Size: {FileSize}\n" +
-                   $"Source URL: {SourceUrl}\tHost URL: {HostUrl}\t" +
-                   $"Direct File URL: {FileDirectUrl}\nOutput File Path: {this.FilePath}\n";
+            return $"File Name: {FileName}\tFile Size: {FileSize}MB\nSource URL: {SourceUrl}\tHost URL: {HostUrl}" +
+                   $"\tDirect File URL: {FileDirectUrl}\nOutput File Path: {this.FilePath}\n";
         }
     }
 }
