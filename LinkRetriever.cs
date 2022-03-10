@@ -108,9 +108,10 @@ namespace GG_Downloader {
         } //input: gog-games url; output: zippy page URLS
 
         private static bool IsGgPageFound(string ggUrl) {
-            // string website = new WebClient().DownloadString(ggUrl);
+            Console.WriteLine(ggUrl);
+            string website = new WebClient().DownloadString(ggUrl);
             
-            return new WebClient().DownloadString(ggUrl).Contains("404 - Good Old Downloads");
+            return website.Contains("404 - Good Old Downloads");
         } //checks if the gg page exists
 
         public static LinkType ValidateInputLink(string inputLink) {
@@ -137,9 +138,9 @@ namespace GG_Downloader {
         public static string GogLinkConversion(string gogLink) {
             string gogGamesLink = Regex.IsMatch(gogLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/\w+")
                 ? Regex.Replace(gogLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/",
-                    @"https:\/\/www\.gog-games\.com\/game\/")
+                    @"https://www.gog-games.com/game/")
                 : gogLink.Replace("https://gog.com", "https://gog-games.com");
-            return !IsGgPageFound(gogGamesLink)
+            return IsGgPageFound(gogGamesLink)
                 ? throw new ServerException("Gog-games page returned 404. Requested URL: " + gogGamesLink)
                 : gogGamesLink;
         }
