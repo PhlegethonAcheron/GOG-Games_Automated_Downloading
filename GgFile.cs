@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace GG_Downloader {
+﻿namespace GG_Downloader {
     public class GgFile {
         public GgFile(string fileName, string sourceUrl, string hostUrl, string fileDirectUrl, string filePath,
             double fileSize) { //full Constructor
@@ -30,8 +28,9 @@ namespace GG_Downloader {
 
 
         public override string ToString() {
-            StringBuilder toStringBuilder = new StringBuilder();
-            return toStringBuilder.ToString();
+            return $"File Name: {this.FileName}\tFile Size: {this.FileSize}\n" +
+                   $"Source URL: {this.SourceUrl}\tHost URL: {this.HostUrl}\t" +
+                   $"Direct File URL: {this.FileDirectUrl}\nOutput File Path: {this.FilePath}\n";
         }
     }
 }
