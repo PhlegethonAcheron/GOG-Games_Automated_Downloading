@@ -7,11 +7,35 @@ namespace GG_Downloader {
     public class GameObj {
         public IList<GgFile> GameFiles { get; set; }
         private const string Basedir = @"%homepath%\Saved Games\GOG_Downloader\"; // todo: make this a field in the settings file
-        private string gameName { get; set; } // todo: Actually Fetch the game name from one of the websites
+        private string GameName { get; set; } // todo: Actually Fetch the game name from one of the websites
+        public string GameDir { get; set; }
         
-        public GameObj(string inputLink) {
-            
-            
+        public GameObj(string inputUrl) {
+            LinkRetriever.LinkType linkClass = LinkRetriever.ValidateInputLink(inputUrl);
+            string ggUrl; // URL for the actual source of the game; if gog.com, converted to gog-games.com link
+            switch (linkClass) {
+                case LinkRetriever.LinkType.InvalidLinkFormat:
+                    throw new ArgumentException("Given input is not a valid URL.", inputUrl);
+                case LinkRetriever.LinkType.InvalidResource:
+                    throw new ArgumentException("Given input URL is not a valid link to a game.", inputUrl);
+                case LinkRetriever.LinkType.InvalidWebsite:
+                    throw new ArgumentException("Given input is not a valid website. Valid websites are: \"gog-games.com\" and \"gog.com\".", inputUrl);
+                case LinkRetriever.LinkType.Gog:
+                    ggUrl = LinkRetriever.GogLinkConversion(inputUrl);
+                    break;
+                case LinkRetriever.LinkType.GogGames:
+                    ggUrl = inputUrl;
+                    break;
+                case LinkRetriever.LinkType.GogLocalized:
+                    ggUrl = LinkRetriever.GogLinkConversion(inputUrl);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            } //dealing with the different potential URL inputs
+            GameName = Regex.Match(inputUrl, @"[^\/]+$").ToString();
+            GameDir = GgFile.ParseFilePath($"{Basedir}{(Regex.IsMatch(Basedir, @"\\$") ? "" : @"\")}{GameName}");
+            GameFiles = LinkRetriever.GogGetZippyLink(ggUrl)
+                .Select(zippyUrl => new GgFile(inputUrl, zippyUrl, GameDir)).ToList();
         }
 
         internal static IEnumerable<GgFile> GetGameFiles(string inputUrl){ //Takes url, returns list of files

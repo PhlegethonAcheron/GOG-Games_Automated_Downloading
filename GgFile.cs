@@ -15,6 +15,15 @@ namespace GG_Downloader {
             FileSize = fileSize;
         }
 
+        public GgFile(string sourceUrl, string hostUrl, string filePath) {
+            SourceUrl = sourceUrl;
+            HostUrl = hostUrl;
+            FilePath = filePath;
+            FileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
+            FileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
+            FileName = LinkRetriever.ZippyGetFileName(hostUrl);
+        }
+
         public GgFile(string sourceUrl, string hostUrl) {
             SourceUrl = sourceUrl;
             HostUrl = hostUrl;
@@ -46,7 +55,6 @@ namespace GG_Downloader {
         /// Throw exception if: Drive specified does not exist, or if it is not a valid path format.
         /// </summary>
         ///
-
         public static string ParseFilePath(string inputPath) {
             // Check that the input is actually a path
             if (!Regex.IsMatch (inputPath, @"(([A-Z]\:)|(%[A-z]+%))(\\[A-z_\-\s0-9\.\\]+)+")) {
