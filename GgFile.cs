@@ -41,12 +41,13 @@ namespace GG_Downloader {
         #region Creating File Path
 
         /// <summary>
-        /// Method <c>ParseFilePath()</c> takes an input path as string, throws exception if the drive specified does not exist.
-        /// Creates all directories required to make the full path exist.
-        /// Can take absolute paths or paths prefixed by windows environment variables as argument.
+        /// Method <c>ParseFilePath()</c> takes an input path as string, returns that path as an absolute file path
+        /// throws exception if the input EnvVar does not exist, or if the  Can take absolute paths or paths prefixed by windows environment variables as argument.
         /// Throw exception if: Drive specified does not exist, or if it is not a valid path format.
         /// </summary>
-        public static void ParseFilePath(string inputPath) {
+        ///
+
+        public static string ParseFilePath(string inputPath) {
             // Check that the input is actually a path
             if (!Regex.IsMatch (inputPath, @"(([A-Z]\:)|(%[A-z]+%))(\\[A-z_\-\s0-9\.\\]+)+")) {
                 throw new ArgumentException("Input is not a valid path", inputPath);
@@ -58,7 +59,16 @@ namespace GG_Downloader {
                     throw new ArgumentException(
                         $"{Regex.Match(inputPath, @"(?<=%).*(?=%)")} is not a valid environment variable."))
                 : inputPath;
+            return absPath;
+        }
 
+                
+        /// <summary>
+        /// Method <c> CreatePathDirs(string AbsolutePath)</c> takes an input of an absolute path, no return type.
+        /// Creates all directories required to make the full path exist.
+        /// Throw exception if: Drive specified does not exist, or if it is not a valid path format.
+        /// </summary>
+        public static void CreatePathDirs(string absPath) {
             string[] splitPath = absPath.Split('\\');
             StringBuilder pathBuilder = new StringBuilder();
             foreach (string pathSubString in splitPath) {

@@ -10,7 +10,7 @@ namespace GG_Downloader {
         private string gameName { get; set; } // todo: Actually Fetch the game name from one of the websites
         
         public GameObj(string inputLink) {
-
+            
             
         }
 
