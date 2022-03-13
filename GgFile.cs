@@ -78,15 +78,15 @@ namespace GG_Downloader {
         /// </summary>
         public static void CreatePathDirs(string absPath) {
             string[] splitPath = absPath.Split('\\');
+            if (splitPath[0].Contains(":") && !Directory.Exists($"{splitPath[0]}{@"\"}")) {
+                throw new ArgumentException("Specified Drive letter does not exist", splitPath[0]);
+               
+            }
             StringBuilder pathBuilder = new StringBuilder();
             foreach (string pathSubString in splitPath) {
                 pathBuilder.Append(pathSubString).Append(@"\");
-                if (Directory.Exists(pathBuilder.ToString())) continue;
-                if (!pathSubString.Contains(":")) {
+                if (!Directory.Exists(pathBuilder.ToString())) {
                     Directory.CreateDirectory(pathBuilder.ToString());
-                }
-                else {
-                    throw new ArgumentException("Specified Drive letter does not exist", pathBuilder.ToString());
                 }
             }
         }
