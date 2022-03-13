@@ -115,6 +115,9 @@ namespace GG_Downloader {
         } //checks if the gg page exists
 
         public static LinkType ValidateInputLink(string inputLink) {
+            if (!Regex.IsMatch(inputLink, @"^https?://")) {
+                inputLink = $"https://{inputLink}";
+            }
             LinkType currentValidityState;
             if (!Regex.IsMatch(inputLink, @"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?$")) {
                 currentValidityState = LinkType.InvalidLinkFormat;
