@@ -21,7 +21,7 @@ namespace GG_Downloader {
             FilePath = filePath;
             FileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
             FileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
-            FileName = LinkRetriever.ZippyGetFileName(hostUrl);
+            FileName = LinkRetriever.ZippyGetFileName(FileDirectUrl);
         }
 
         public GgFile(string sourceUrl, string hostUrl) {
@@ -29,7 +29,7 @@ namespace GG_Downloader {
             HostUrl = hostUrl;
             FileDirectUrl = LinkRetriever.ZippyGetFileLink(hostUrl);
             FileSize = LinkRetriever.ZippyGetFileSize(hostUrl);
-            FileName = LinkRetriever.ZippyGetFileName(hostUrl);
+            FileName = LinkRetriever.ZippyGetFileName(FileDirectUrl);
         }
 
         //_sourceUrl: OG URL input | _hostUrl: Raw Zippy URL | _fileDirectUrl: ddl zippy url

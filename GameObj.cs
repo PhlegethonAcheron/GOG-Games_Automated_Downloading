@@ -10,7 +10,7 @@ namespace GG_Downloader {
         private const string Basedir = @"%homepath%\Saved Games\GOG_Downloader\"; // todo: make this a field in the settings file
         public string GameName { get; set; } // todo: Actually Fetch the game name from one of the websites
         public string GameDir { get; set; }
-        
+
         public GameObj(string inputUrl) {
             LinkRetriever.LinkType linkClass = LinkRetriever.ValidateInputLink(inputUrl);
             string ggUrl; // URL for the actual source of the game; if gog.com, converted to gog-games.com link
@@ -38,13 +38,17 @@ namespace GG_Downloader {
             GameFiles = LinkRetriever.GogGetZippyLink(ggUrl)
                 .Select(zippyUrl => new GgFile(inputUrl, zippyUrl, GameDir)).ToList();
             foreach (GgFile gameFile in GameFiles) {
-                gameFile.FilePath = $"{gameFile.FilePath}{@"\"}{gameFile.FileName}";
+                gameFile.FilePath = $"{gameFile.FilePath}{@"\"}{(gameFile.FileName.Contains("extra") ? "extras" : "game")}{@"\"}{gameFile.FileName}";
             }
         }
 
+        public void createDirStructure() {
+            
+        }
         public void StartDownloads() {
-            GgFile.CreatePathDirs(this.GameDir);
-            GameMultiDownloader.FileAsyncDownloader(this);
+            GgFile.CreatePathDirs($"{this.GameDir}{@"\"}extras");
+            GgFile.CreatePathDirs($"{this.GameDir}{@"\"}game");
+            GameMultiDownloader.FileAsyncDownloader(this).Wait();
         }
 
         public override string ToString() {

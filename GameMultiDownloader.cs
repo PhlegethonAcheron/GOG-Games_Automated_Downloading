@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GG_Downloader {
     public static class GameMultiDownloader {
-        public static async void FileAsyncDownloader(GameObj gameObj) {
+        public static async Task FileAsyncDownloader(GameObj gameObj) {
             Console.WriteLine($"Started Downloading game {gameObj.GameName}");
             var tasks = new List<Task>();
             var webClient = new HttpClient();
@@ -20,7 +20,7 @@ namespace GG_Downloader {
         }
         
         private static async Task DownloadFile(Uri fileUri, string destFilePath, HttpClient webClient) {
-            Console.WriteLine($"Started Downloading {fileUri} to {destFilePath}");
+            Console.WriteLine($"\tStarted Downloading {fileUri} to {destFilePath}");
             using var inStream = await webClient.GetStreamAsync(fileUri);
             using var outStream = new FileStream(destFilePath, FileMode.Create);
             await inStream.CopyToAsync(outStream);
