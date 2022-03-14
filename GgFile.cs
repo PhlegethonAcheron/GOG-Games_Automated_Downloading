@@ -33,10 +33,10 @@ namespace GG_Downloader {
         }
 
         //_sourceUrl: OG URL input | _hostUrl: Raw Zippy URL | _fileDirectUrl: ddl zippy url
-        private string FileName { get; }
+        public string FileName { get; }
         private string SourceUrl { get; }
         private string HostUrl { get; }
-        private string FileDirectUrl { get; }
+        public string FileDirectUrl { get; }
         protected internal string FilePath { get; set; }
         private double FileSize { get; }
 
