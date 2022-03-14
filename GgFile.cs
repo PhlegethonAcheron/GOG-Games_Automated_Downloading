@@ -85,7 +85,7 @@ namespace GG_Downloader {
             StringBuilder pathBuilder = new StringBuilder();
             foreach (string pathSubString in splitPath) {
                 pathBuilder.Append(pathSubString).Append(@"\");
-                if (!Directory.Exists(pathBuilder.ToString())) {
+                if(!Directory.Exists(pathBuilder.ToString())) {
                     Directory.CreateDirectory(pathBuilder.ToString());
                 }
             }

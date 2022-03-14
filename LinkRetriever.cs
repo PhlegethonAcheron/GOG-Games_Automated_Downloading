@@ -76,7 +76,7 @@ namespace GG_Downloader {
 
         public static string ZippyGetFileName(string fileLink) {
             //Takes output of ZippyGetFileLink, returns unescaped filename
-            return Uri.UnescapeDataString(Regex.Match(fileLink, "(?<=(\\d\\d\\d\\d\\d\\/))\\S+").ToString());
+            return Uri.UnescapeDataString(Regex.Match(fileLink, @"[^/]+$").ToString());
         }
 
         public static IList<string> GogGetZippyLink(string inputUrl) {

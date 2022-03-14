@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace GG_Downloader {
@@ -42,11 +43,16 @@ namespace GG_Downloader {
         }
 
         public void StartDownloads() {
+            GgFile.CreatePathDirs(this.GameDir);
             GameMultiDownloader.FileAsyncDownloader(this);
         }
 
         public override string ToString() {
-            return $"Game Name: {GameName}\t Game Location: {Basedir}\n Game File Information: {GameFiles.Select(gameFile => gameFile.ToString())}";
+            var gameFileInfoBuilder = new StringBuilder();
+            foreach (var gameFile in GameFiles) {
+                gameFileInfoBuilder.Append(gameFile);
+            }
+            return $"Game Name: {GameName}\t Game Location: {Basedir}\n Game File Information: {gameFileInfoBuilder}";
         }
     }
 }
