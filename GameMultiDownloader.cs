@@ -11,7 +11,7 @@ namespace GG_Downloader {
             var tasks = new List<Task>();
             var webClient = new HttpClient();
             foreach (var gameFile in gameObj.GameFiles) {
-                var t = DownloadFile(new Uri(gameFile.FileDirectUrl), $"{gameFile.FilePath}{gameFile.FileName}",
+                var t = DownloadFile(new Uri(gameFile.FileDirectUrl), $"{gameFile.FilePath}",
                     webClient);
                 tasks.Add(t);
             }
@@ -26,6 +26,5 @@ namespace GG_Downloader {
             await inStream.CopyToAsync(outStream);
             Console.WriteLine($"\tFinished Downloading {fileUri} to {destFilePath}");
         }
-        
     }
 }

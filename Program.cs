@@ -1,27 +1,11 @@
 ﻿using System;
-using System.Linq;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Common;
 
 namespace GG_Downloader
 {
     public static class Program {
         public static void Main()
         {
-            var homeDir = @"C:\Users\Townsend\Saved Games\TestFiles";
-            using (var archive = RarArchive.Open($"{homeDir}{@"\"}Exported Playlists.part01.rar"))
-            {
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-                {
-                    entry.WriteToDirectory(homeDir, new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-                }
-            }
-            // HappyPathTesting();
+            HappyPathTesting();
 
             Quit();
         }
@@ -40,7 +24,9 @@ namespace GG_Downloader
             var gameObj = new GameObj(urlInput);
             Console.WriteLine(gameObj);
             gameObj.StartDownloads();
-            
+            // GameObj.ExtractFilesFromDirectory($"{gameObj.GameDir}\\extras");
+            // GameObj.ExtractFilesFromDirectory($"{gameObj.GameDir}\\game");
+
         }
     }
 }

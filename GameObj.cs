@@ -52,7 +52,7 @@ namespace GG_Downloader {
             GameMultiDownloader.FileAsyncDownloader(this).Wait();
         }
 
-
+        // public static void ExtractAllDownloads(GameObj)
         public static void ExtractFilesFromDirectory(string inputDirectoryPath) {
             var fileNames = Directory.GetFiles(inputDirectoryPath);
             foreach (var fileName in fileNames) {
@@ -63,15 +63,13 @@ namespace GG_Downloader {
         }
 
         private static void ExtractRar(string filePath) {
-            var homeDir = Regex.Replace(Regex.Replace(filePath, @"[^\\]+$", ""), @"\\$", "");
             using var archive = RarArchive.Open(filePath);
-            foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-            {
-                entry.WriteToDirectory(homeDir, new ExtractionOptions()
-                {
-                    ExtractFullPath = true,
-                    Overwrite = true
-                });
+            foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory)) {
+                entry.WriteToDirectory(Regex.Replace(Regex.Replace(filePath, @"[^\\]+$", ""), @"\\$", ""),
+                    new ExtractionOptions() {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
             }
         }
 
