@@ -2,5 +2,6 @@
 	
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\mscorlib.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\Townsend\RiderProjects\GG_Downloader\UnRAR.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=dlbutton/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

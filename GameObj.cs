@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using SharpCompress.Archives;
+using SharpCompress.Archives.Rar;
+using SharpCompress.Common;
 
 namespace GG_Downloader {
     public class GameObj {
@@ -42,13 +45,26 @@ namespace GG_Downloader {
             }
         }
 
-        public void createDirStructure() {
-            
-        }
         public void StartDownloads() {
             GgFile.CreatePathDirs($"{this.GameDir}{@"\"}extras");
             GgFile.CreatePathDirs($"{this.GameDir}{@"\"}game");
             GameMultiDownloader.FileAsyncDownloader(this).Wait();
+        }
+
+        public static void ExtractFilesFromDirectory(string inputDirectoryPath) {
+            // C:\Users\Townsend\Saved Games\TestFiles
+            var homeDir = inputDirectoryPath;
+            using (var archive = RarArchive.Open($"{homeDir}{@"\"}Exported Playlists.part01.rar"))
+            {
+                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+                {
+                    entry.WriteToDirectory(homeDir, new ExtractionOptions()
+                    {
+                        ExtractFullPath = true,
+                        Overwrite = true
+                    });
+                }
+            }
         }
 
         public override string ToString() {
