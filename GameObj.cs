@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -51,19 +52,26 @@ namespace GG_Downloader {
             GameMultiDownloader.FileAsyncDownloader(this).Wait();
         }
 
+
         public static void ExtractFilesFromDirectory(string inputDirectoryPath) {
-            // C:\Users\Townsend\Saved Games\TestFiles
-            var homeDir = inputDirectoryPath;
-            using (var archive = RarArchive.Open($"{homeDir}{@"\"}Exported Playlists.part01.rar"))
-            {
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
-                {
-                    entry.WriteToDirectory(homeDir, new ExtractionOptions()
-                    {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
+            var fileNames = Directory.GetFiles(inputDirectoryPath);
+            foreach (var fileName in fileNames) {
+                if (Regex.IsMatch(fileName, @"((part(0+)1\.rar))") || !fileName.Contains("part")) {
+                    ExtractRar(fileName);
                 }
+            }
+        }
+
+        private static void ExtractRar(string filePath) {
+            var homeDir = Regex.Replace(Regex.Replace(filePath, @"[^\\]+$", ""), @"\\$", "");
+            using var archive = RarArchive.Open(filePath);
+            foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory))
+            {
+                entry.WriteToDirectory(homeDir, new ExtractionOptions()
+                {
+                    ExtractFullPath = true,
+                    Overwrite = true
+                });
             }
         }
 
