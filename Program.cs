@@ -5,8 +5,7 @@ namespace GG_Downloader
     public static class Program {
         public static void Main()
         {
-            GameInstaller.CleanupV2("C:\\Users\\Townsend\\Saved Games\\GOG_Downloader\\mule\\game");
-            // HappyPathTesting();
+            HappyPathTesting();
             Quit();
         }
         
@@ -19,8 +18,9 @@ namespace GG_Downloader
 
         // ReSharper disable once UnusedMember.Local
         private static void HappyPathTesting() {
-            Console.WriteLine("Enter gog URL:\n" + "https://www.gog.com/ru/game/mule");
-            const string urlInput = "https://www.gog.com/ru/game/mule";
+            Console.WriteLine("Enter gog URL:");
+            // const string urlInput = "https://www.gog.com/ru/game/mule";
+            var urlInput = Console.ReadLine();
             var gameObj = new GameObj(urlInput);
             Console.WriteLine(gameObj);
             gameObj.StartDownloads();

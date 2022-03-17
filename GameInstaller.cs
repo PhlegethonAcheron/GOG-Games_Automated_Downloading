@@ -64,7 +64,7 @@ internal static class GameInstaller {
 #pragma warning disable CS0219
         int exitCode;
 #pragma warning restore CS0219
-        string arguments =
+        var arguments =
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             $"/portable=1 /dir=\"{installDir}\" /{(silence ? "verysilent" : "silent")} /suppressmsgboxes /noicons /norestart /nocloseapplications /lang=english";
         try {
@@ -103,26 +103,23 @@ internal static class GameInstaller {
             @"[\s\S]+\.rar$",
             @"Uploaded by www.*.com\.txt$",
             @"unins000\.ini$",
-            @"unins000\.dat$",
             @"support\.ico$",
             @"gog\.ico$",
             @"goglog\.ini$",
             @"webcache\.zip$",
+            @"(setup).*(\(\d+\))\.exe",
             "redist"
         };
         var fileNames = (Directory.GetFiles(inputDirectoryPath).ToList());
         fileNames.AddRange((Directory.GetDirectories(inputDirectoryPath).ToList()));
-        foreach (var fileName in fileNames) {
-            foreach (string regex in cleanupRegexes) {
-                if (!Regex.IsMatch(fileName, regex)) continue;
-                if (File.GetAttributes(fileName).HasFlag(FileAttributes.Directory)) {
-                    Console.WriteLine($"\tDeleting Directory {fileName}");
-                    FileSystem.DeleteDirectory(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                }
-                else {
-                    Console.WriteLine($"\tDeleting file {fileName}");
-                    FileSystem.DeleteFile(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                }
+        foreach (var fileName in from fileName in fileNames from regex in cleanupRegexes where Regex.IsMatch(fileName, regex) select fileName) {
+            if (File.GetAttributes(fileName).HasFlag(FileAttributes.Directory)) {
+                Console.WriteLine($"\tDeleting Directory {fileName}");
+                FileSystem.DeleteDirectory(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+            }
+            else {
+                Console.WriteLine($"\tDeleting file {fileName}");
+                FileSystem.DeleteFile(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
             }
         }
     }

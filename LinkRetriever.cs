@@ -120,6 +120,7 @@ namespace GG_Downloader {
             }
             LinkType currentValidityState;
             if (!Regex.IsMatch(inputLink, @"^(ht|f)tp(s?)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?$")) {
+                
                 currentValidityState = LinkType.InvalidLinkFormat;
             }
             else if (!Regex.IsMatch(inputLink, "(gog-games|gog)")) {
@@ -128,7 +129,7 @@ namespace GG_Downloader {
             else if (Regex.IsMatch(inputLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/\w+")) {
                 currentValidityState = LinkType.GogLocalized;
             } 
-            else if (Regex.IsMatch(inputLink, @"https:\/\/www\.(gog-games|gog)\.com\/game\/\w+")) {
+            else if (Regex.IsMatch(inputLink, @"https:\/\/(www\.)?(gog-games|gog)\.com\/game\/\w+")) {
                 currentValidityState = inputLink.Contains("gog-games") ? LinkType.GogGames : LinkType.Gog;
             }
             else {
