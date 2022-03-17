@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.FileIO;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
 using SharpCompress.Common;
+using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
 
 namespace GG_Downloader;
 
-internal class GameInstaller {
+internal static class GameInstaller {
     public static void ExtractFilesFromDirectory(string inputDirectoryPath) {
+        Console.WriteLine($"Extracting .rar files from {inputDirectoryPath}");
         var fileNames = Directory.GetFiles(inputDirectoryPath);
         foreach (var fileName in fileNames) {
             if (Regex.IsMatch(fileName, @"((part(0+)1\.rar))") || (fileName.Contains("rar")&& !fileName.Contains("part"))) {
@@ -21,6 +26,7 @@ internal class GameInstaller {
 
     private static void ExtractRar(string filePath) {
         using var archive = RarArchive.Open(filePath);
+        Console.WriteLine($"\tExtracting {Regex.Match(filePath, @"[^\\]+$")}");
         foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory)) {
             entry.WriteToDirectory(Regex.Replace(Regex.Replace(filePath, @"[^\\]+$", ""), @"\\$", ""),
                 new ExtractionOptions() {
@@ -52,11 +58,14 @@ internal class GameInstaller {
     /// </summary>
     /// <param name="executablePath"></param>
     /// <returns>Exit code: 3 For success, -1 for failure due to not having admin permissions.</returns>
-    public static int InstallFromSetupExecutable(string executablePath) {
+    private static void InstallFromSetupExecutable(string executablePath) {
         var installDir = Regex.Match(executablePath, @"([\s\S]).*(?=(setup).*(\(\d+\))\.exe)").ToString();
+        Console.WriteLine($"\tInstalling {Regex.Match(executablePath, @"(setup).*(\(\d+\))\.exe")}");
         var proc = new Process();
         var silence = false;
+#pragma warning disable CS0219
         int exitCode;
+#pragma warning restore CS0219
         string arguments =
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
             $"/portable=1 /dir=\"{installDir}\" /{(silence ? "verysilent" : "silent")} /suppressmsgboxes /noicons /norestart /nocloseapplications /lang=english";
@@ -69,19 +78,48 @@ internal class GameInstaller {
             // ReSharper disable once UnusedVariable
             string outPut = proc.StandardOutput.ReadToEnd();
             proc.WaitForExit();
-            exitCode = proc.ExitCode;
+            // exitCode = proc.ExitCode;
             proc.Close();
-            // Console.WriteLine(outPut);
-            // Console.WriteLine(proc.ExitCode);
         }
         catch (InvalidOperationException) {
+            // ReSharper disable once RedundantAssignment
             exitCode = -1;
         }
-        return exitCode;
     }
 
-    public static bool CleanupRars(string inputDirectoryPath) {
-        return true;
+    /// <summary>
+    /// Moves all rar files and "Uploaded by gog-games.txt" files to the recycle bin.
+    /// </summary>
+    /// <param name="inputDirectoryPath"></param>
+    public static void CleanupFiles(string inputDirectoryPath) {
+        var fileNames = Directory.GetFiles(inputDirectoryPath);
+        foreach (var fileName in fileNames) {
+            if (Regex.IsMatch(fileName, @"[\s\S]+\.rar$") || fileName.Contains("Uploaded by www.gog-games.com.txt")) {
+                FileSystem.DeleteFile(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+            }
+        }
     }
-    
+
+    public static void CleanupV2(string inputDirectoryPath) {
+        var cleanupRegexes = new List<string>() {
+            @"[\s\S]+\.rar$",
+            @"^Uploaded by www.*.com\.txt$",
+            @"^unins000\.ini$",
+            @"^unins000\.dat$",
+            @"^support\.ico$",
+            @"^gog\.ico$",
+            @"^goglog\.ini$",
+            @"^webcache\.zip$"
+        };
+        var fileNames = Directory.GetFiles(inputDirectoryPath);
+        foreach (var fileName in fileNames) {
+            foreach (string dummy in cleanupRegexes.Where(regex => Regex.IsMatch(fileName, regex))) {
+                if (File.GetAttributes(fileName).HasFlag(FileAttribute.Directory)) {
+                    FileSystem.DeleteDirectory(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                } else {
+                    FileSystem.DeleteFile(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                }
+            }
+        }
+    }
 }

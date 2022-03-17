@@ -43,11 +43,30 @@ namespace GG_Downloader {
         }
         public void StartDownloads() {
             GgFile.CreatePathDirs($"{this.GameDir}{@"\"}extras");
+            Console.WriteLine($"Created Path {this.GameDir}{@"\"}extras");
+
             GgFile.CreatePathDirs($"{this.GameDir}{@"\"}game");
+            Console.WriteLine($"Created Path {this.GameDir}{@"\"}game");
+
             GameMultiDownloader.FileAsyncDownloader(this).Wait();
         }
 
-        // public static void ExtractAllDownloads(GameObj)
+        public void ExtractDownloads() {
+            Console.WriteLine("Extraction Started.");
+            GameInstaller.ExtractFilesFromDirectory($"{this.GameDir}\\extras");
+            GameInstaller.ExtractFilesFromDirectory($"{this.GameDir}\\game");
+        }
+        
+        public void CleanupDownloads() {
+            Console.WriteLine("Cleaning Up Files");
+            GameInstaller.CleanupFiles($"{this.GameDir}\\extras");
+            GameInstaller.CleanupFiles($"{this.GameDir}\\game");
+        }
+        
+        public void InstallDownloads() {
+            Console.WriteLine($"Installing Game to {this.GameDir}\\game");
+            GameInstaller.InstallGivenDirectory($"{this.GameDir}\\game");
+        }
 
 
         public override string ToString() {
