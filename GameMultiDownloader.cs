@@ -26,5 +26,7 @@ namespace GG_Downloader {
             await inStream.CopyToAsync(outStream);
             Console.WriteLine($"\tFinished Downloading {fileUri} to {destFilePath}");
         }
+        
+        
     }
 }
