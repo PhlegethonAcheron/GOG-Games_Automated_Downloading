@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using SharpCompress.Archives;
-using SharpCompress.Archives.Rar;
-using SharpCompress.Common;
 
 namespace GG_Downloader {
     public class GameObj {
@@ -45,7 +41,6 @@ namespace GG_Downloader {
                 gameFile.FilePath = $"{gameFile.FilePath}{@"\"}{(gameFile.FileName.Contains("extra") ? "extras" : "game")}{@"\"}{gameFile.FileName}";
             }
         }
-
         public void StartDownloads() {
             GgFile.CreatePathDirs($"{this.GameDir}{@"\"}extras");
             GgFile.CreatePathDirs($"{this.GameDir}{@"\"}game");
@@ -53,25 +48,7 @@ namespace GG_Downloader {
         }
 
         // public static void ExtractAllDownloads(GameObj)
-        public static void ExtractFilesFromDirectory(string inputDirectoryPath) {
-            var fileNames = Directory.GetFiles(inputDirectoryPath);
-            foreach (var fileName in fileNames) {
-                if (Regex.IsMatch(fileName, @"((part(0+)1\.rar))") || !fileName.Contains("part")) {
-                    ExtractRar(fileName);
-                }
-            }
-        }
 
-        private static void ExtractRar(string filePath) {
-            using var archive = RarArchive.Open(filePath);
-            foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory)) {
-                entry.WriteToDirectory(Regex.Replace(Regex.Replace(filePath, @"[^\\]+$", ""), @"\\$", ""),
-                    new ExtractionOptions() {
-                        ExtractFullPath = true,
-                        Overwrite = true
-                    });
-            }
-        }
 
         public override string ToString() {
             var gameFileInfoBuilder = new StringBuilder();

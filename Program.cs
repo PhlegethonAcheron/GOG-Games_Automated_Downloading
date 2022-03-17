@@ -5,7 +5,8 @@ namespace GG_Downloader
     public static class Program {
         public static void Main()
         {
-            HappyPathTesting();
+            GameInstaller.InstallFromSetupExecutable(@"C:\Users\Townsend\Saved Games\GOG_Downloader\mule\game\setup_m.u.l.e._1.00_(45107).exe");
+            // HappyPathTesting();
 
             Quit();
         }
@@ -24,8 +25,8 @@ namespace GG_Downloader
             var gameObj = new GameObj(urlInput);
             Console.WriteLine(gameObj);
             gameObj.StartDownloads();
-            // GameObj.ExtractFilesFromDirectory($"{gameObj.GameDir}\\extras");
-            // GameObj.ExtractFilesFromDirectory($"{gameObj.GameDir}\\game");
+            GameInstaller.ExtractFilesFromDirectory($"{gameObj.GameDir}\\extras");
+            GameInstaller.ExtractFilesFromDirectory($"{gameObj.GameDir}\\game");
 
         }
     }
