@@ -11,9 +11,11 @@ namespace GG_Downloader {
             var tasks = new List<Task>();
             var webClient = new HttpClient();
             foreach (var gameFile in gameObj.GameFiles) {
+                if (File.Exists(gameFile.FilePath)) continue;
                 var t = DownloadFile(new Uri(gameFile.FileDirectUrl), $"{gameFile.FilePath}",
                     webClient);
                 tasks.Add(t);
+
             }
             await Task.WhenAll(tasks);
             Console.WriteLine($"Finished Downloading game {gameObj.GameName} to {gameObj.GameDir}");

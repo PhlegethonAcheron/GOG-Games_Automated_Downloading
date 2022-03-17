@@ -63,6 +63,12 @@ namespace GG_Downloader {
             GameInstaller.CleanupFiles($"{this.GameDir}\\game");
         }
         
+        public void CleanupDownloadsV2() {
+            Console.WriteLine("Cleaning Up Files");
+            GameInstaller.CleanupV2($"{this.GameDir}\\extras");
+            GameInstaller.CleanupV2($"{this.GameDir}\\game");
+        }
+        
         public void InstallDownloads() {
             Console.WriteLine($"Installing Game to {this.GameDir}\\game");
             GameInstaller.InstallGivenDirectory($"{this.GameDir}\\game");

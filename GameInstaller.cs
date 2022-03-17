@@ -4,12 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.FileIO;
 using SharpCompress.Archives;
 using SharpCompress.Archives.Rar;
 using SharpCompress.Common;
-using FileSystem = Microsoft.VisualBasic.FileIO.FileSystem;
 
 namespace GG_Downloader;
 
@@ -109,12 +107,13 @@ internal static class GameInstaller {
             @"^support\.ico$",
             @"^gog\.ico$",
             @"^goglog\.ini$",
-            @"^webcache\.zip$"
+            @"^webcache\.zip$",
+            @"^__redist"
         };
         var fileNames = Directory.GetFiles(inputDirectoryPath);
         foreach (var fileName in fileNames) {
             foreach (string dummy in cleanupRegexes.Where(regex => Regex.IsMatch(fileName, regex))) {
-                if (File.GetAttributes(fileName).HasFlag(FileAttribute.Directory)) {
+                if (File.GetAttributes(fileName).HasFlag(System.IO.FileAttributes.Directory)) {
                     FileSystem.DeleteDirectory(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
                 } else {
                     FileSystem.DeleteFile(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);

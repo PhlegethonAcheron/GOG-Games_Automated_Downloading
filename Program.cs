@@ -1,17 +1,11 @@
 ﻿using System;
-using System.IO;
-using Microsoft.VisualBasic;
 
 namespace GG_Downloader
 {
     public static class Program {
         public static void Main()
         {
-            var path = @"C:\Users\Townsend\Saved Games\GOG_Downloader\mule\extras";
-            var isDir = File.GetAttributes(path).HasFlag(FileAttribute.Directory);
-            // HappyPathTesting();
-            Console.WriteLine(isDir.ToString());
-
+            HappyPathTesting();
             Quit();
         }
         
@@ -30,8 +24,8 @@ namespace GG_Downloader
             Console.WriteLine(gameObj);
             gameObj.StartDownloads();
             gameObj.ExtractDownloads();
-            gameObj.CleanupDownloads();
             gameObj.InstallDownloads();
+            gameObj.CleanupDownloadsV2();
         }
     }
 }
