@@ -101,21 +101,26 @@ internal static class GameInstaller {
     public static void CleanupV2(string inputDirectoryPath) {
         var cleanupRegexes = new List<string>() {
             @"[\s\S]+\.rar$",
-            @"^Uploaded by www.*.com\.txt$",
-            @"^unins000\.ini$",
-            @"^unins000\.dat$",
-            @"^support\.ico$",
-            @"^gog\.ico$",
-            @"^goglog\.ini$",
-            @"^webcache\.zip$",
-            @"^__redist"
+            @"Uploaded by www.*.com\.txt$",
+            @"unins000\.ini$",
+            @"unins000\.dat$",
+            @"support\.ico$",
+            @"gog\.ico$",
+            @"goglog\.ini$",
+            @"webcache\.zip$",
+            "redist"
         };
-        var fileNames = Directory.GetFiles(inputDirectoryPath);
+        var fileNames = (Directory.GetFiles(inputDirectoryPath).ToList());
+        fileNames.AddRange((Directory.GetDirectories(inputDirectoryPath).ToList()));
         foreach (var fileName in fileNames) {
-            foreach (string dummy in cleanupRegexes.Where(regex => Regex.IsMatch(fileName, regex))) {
-                if (File.GetAttributes(fileName).HasFlag(System.IO.FileAttributes.Directory)) {
+            foreach (string regex in cleanupRegexes) {
+                if (!Regex.IsMatch(fileName, regex)) continue;
+                if (File.GetAttributes(fileName).HasFlag(FileAttributes.Directory)) {
+                    Console.WriteLine($"\tDeleting Directory {fileName}");
                     FileSystem.DeleteDirectory(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                } else {
+                }
+                else {
+                    Console.WriteLine($"\tDeleting file {fileName}");
                     FileSystem.DeleteFile(fileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
                 }
             }

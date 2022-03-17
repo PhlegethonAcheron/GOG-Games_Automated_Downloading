@@ -5,7 +5,8 @@ namespace GG_Downloader
     public static class Program {
         public static void Main()
         {
-            HappyPathTesting();
+            GameInstaller.CleanupV2("C:\\Users\\Townsend\\Saved Games\\GOG_Downloader\\mule\\game");
+            // HappyPathTesting();
             Quit();
         }
         
