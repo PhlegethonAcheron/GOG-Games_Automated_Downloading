@@ -20,12 +20,14 @@ namespace GG_Downloader {
             await Task.WhenAll(tasks);
             Console.WriteLine($"Finished Downloading game {gameObj.GameName} to {gameObj.GameDir}");
         }
-        
+
         private static async Task DownloadFile(Uri fileUri, string destFilePath, HttpClient webClient) {
             Console.WriteLine($"\tStarted Downloading {fileUri} to {destFilePath}");
-            using var inStream = await webClient.GetStreamAsync(fileUri);
-            using var outStream = new FileStream(destFilePath, FileMode.Create);
-            await inStream.CopyToAsync(outStream);
+            using (var inStream = await webClient.GetStreamAsync(fileUri)) {
+                using (var outStream = new FileStream(destFilePath, FileMode.Create)) {
+                    await inStream.CopyToAsync(outStream);
+                }
+            }
             Console.WriteLine($"\tFinished Downloading {fileUri} to {destFilePath}");
         }
         
