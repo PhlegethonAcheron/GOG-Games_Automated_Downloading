@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Runtime.Remoting;
 using System.Text.RegularExpressions;
@@ -67,10 +68,12 @@ namespace GG_Downloader {
         }
 
         public static double ZippyGetFileSize(string rawZippyUrl) {
+            // Console.WriteLine(rawZippyUrl);
             string website = new WebClient().DownloadString(rawZippyUrl);
+            // Console.WriteLine(website);
             // \d+\.\d+ ((MB)|(KB))
-            string sizeAsString = Regex.Match(website, "\\d+\\.\\d+ ((MB)|(KB))").ToString();
-            double sizeInMBytes = Double.Parse(Regex.Match(sizeAsString, "\\d+\\.\\d+").ToString());
+            string sizeAsString = Regex.Match(website, @"(\d+|(\d+\.\d+)) ((MB)|(KB))").ToString();
+            double sizeInMBytes = Double.Parse(Regex.Match(sizeAsString, @"(\d+|(\d+\.\d+))").ToString());
             return sizeInMBytes;
         }
 
@@ -91,8 +94,24 @@ namespace GG_Downloader {
             driver.FindElement(By.CssSelector(".g-recaptcha")).Click();
 
             //waiting until the links load in, then extracting them from parent elements
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(120));
-            wait.Until(e => e.FindElement(By.XPath("/html/body/div[4]/div[2]/div/div[2]/div/div[1]")));
+            
+            try {
+                WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(120));
+                wait.Until(e => e.FindElement(By.XPath("/html/body/div[4]/div[2]/div/div[2]/div/div[1]")));
+            }
+            catch (FormatException e) {
+                Console.WriteLine($"{e}\nWaiting for the element to exist failed, falling back to iteratively checking for Zippy Links.");
+                bool matcher = false;
+                while (matcher == false) {
+                    IList<IWebElement> linkChecker = driver.FindElements(By.TagName("a"));
+                    var linkCheckerLink = linkChecker.FirstOrDefault(x => x.ToString().Contains("zippy"));
+                    if (linkCheckerLink != null) {
+                        matcher = true;
+                    }
+                }
+                throw;
+            }
+            
             IList<IWebElement> foundLinks = driver.FindElements(By.TagName("a"));
 
             //filtering only the zippyshare links from the list of all links
