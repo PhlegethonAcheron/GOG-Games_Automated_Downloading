@@ -34,7 +34,7 @@ namespace GG_Downloader {
                     throw new ArgumentOutOfRangeException();
             } //dealing with the different potential URL inputs
             GameName = Regex.Match(inputUrl, @"[^\/]+$").ToString();
-            GameDir = GgFile.ParseFilePath($"{Basedir}{(Regex.IsMatch(Basedir, @"\\$") ? "" : @"\")}{GameName}");
+            GameDir = GgFile.ParseFilePath($"{Basedir}{(Regex.IsMatch(Basedir, @"(\\|￥)$") ? "" : @"\")}{GameName}");
             GameFiles = LinkRetriever.GogGetZippyLink(ggUrl)
                 .Select(zippyUrl => new GgFile(inputUrl, zippyUrl, GameDir)).ToList();
             foreach (GgFile gameFile in GameFiles) {

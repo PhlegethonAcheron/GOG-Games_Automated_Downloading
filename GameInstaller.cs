@@ -25,9 +25,10 @@ namespace GG_Downloader {
         private static void ExtractRar(string filePath) {
             using (var archive = RarArchive.Open(filePath)) {
                 Console.WriteLine($"\tExtracting {Regex.Match(filePath, @"[^\\]+$")}");
-                foreach (var entry in archive.Entries.Where(entry => !entry.IsDirectory)) {
-                    entry.WriteToDirectory(Regex.Replace(Regex.Replace(filePath, @"[^\\]+$", ""), @"\\$", ""),
-                        new ExtractionOptions() { ExtractFullPath = true, Overwrite = true });
+                foreach (var entry in archive.Entries) {
+                    if (!entry.IsDirectory) {
+                        entry.WriteToDirectory(Regex.Replace(Regex.Replace(filePath, @"[^\\\¥]+$", ""), @"[\\\¥]$", ""), new ExtractionOptions() { ExtractFullPath = true, Overwrite = true });
+                    }
                 }
             }
         }

@@ -37,8 +37,8 @@
       <Optimize>true</Optimize>
       <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
       <Prefer32bit>true</Prefer32bit>
-      <DocumentationFile>bin\Release x64\GG_Downloader.xml</DocumentationFile>
-      <OutputPath>bin\x86\Release x86\</OutputPath>
+      <DocumentationFile></DocumentationFile>
+      <OutputPath>bin\Release x86\</OutputPath>
       <PlatformTarget>x86</PlatformTarget>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release x64|x64' ">

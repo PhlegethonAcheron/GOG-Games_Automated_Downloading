@@ -3,12 +3,11 @@
 namespace GG_Downloader
 {
     public static class Program {
-        public static void Main()
-        {
+        public static void Main() {
             HappyPathTesting();
             Quit();
         }
-        
+
         private static void Quit()
         {
             Console.WriteLine("Done\nPress ENTER to Exit");
@@ -19,7 +18,6 @@ namespace GG_Downloader
         // ReSharper disable once UnusedMember.Local
         private static void HappyPathTesting() {
             Console.WriteLine("Enter gog URL:");
-            // const string urlInput = "https://www.gog.com/ru/game/mule";
             var urlInput = Console.ReadLine();
             var gameObj = new GameObj(urlInput);
             Console.WriteLine(gameObj);
@@ -30,3 +28,8 @@ namespace GG_Downloader
         }
     }
 }
+//make installer work when there is a .bin file
+//proper CLI arguments
+//not deleting everything
+//not rely on chrome
+//do a better job of finding things
