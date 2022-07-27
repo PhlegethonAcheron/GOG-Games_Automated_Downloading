@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Runtime.Remoting;
 using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
@@ -20,20 +21,58 @@ namespace GG_Downloader {
             InvalidWebsite, //Not one of the accepted link formats
             InvalidLinkFormat
         } //used to return types of links
+        
+        public static string ZippyExtractDLlink(string website) {
+            // Console.WriteLine(website);
+            var doc = new HtmlDocument();
+            doc.LoadHtml(website);
+            
+            //gets the parent div of the bit I want
+            string lrbox = doc.GetElementbyId("lrbox").InnerHtml;
+            
+            //gets the script that constructs the link
+            string math = Regex.Match(lrbox, "<script type=\"text/javascript\">[\\S\\s]+?</script>", RegexOptions.Multiline).ToString();
+            
+            //the JS gets the properties of an element, so i'm extracting that element and properties
+            string annoyingElementName = Regex.Match(math, @"(?<=var [a-z] = document.getElementById\(')[a-z]+(?='\)\.get)").ToString();
+            string annoyingElementAttr = Regex.Match(math, @"(?<=var [a-z] = document.getElementById\('[a-z]+'\)\.getAttribute\(')[a-z]+").ToString();
+            var annoyingValue = doc.GetElementbyId(annoyingElementName).Attributes[annoyingElementAttr].Value;
+
+            #region rewriting the javascript to make it a standalone function that I can execute
+            
+            //inserting the annoying value into the JS code
+            string mathFixed = Regex.Replace(math, @"(?<=var [a-z] = )document\.getElementBy.+(?=;)", annoyingValue);
+            
+            //rewriting it to make it ane executable function
+            mathFixed = Regex.Replace(mathFixed, @"if \(document[\S\s]+?\}", "return linkbits;");
+            mathFixed = Regex.Replace(mathFixed, @"document\.getElementById\('dlbutton'\)\.href", "linkbits");            mathFixed = Regex.Replace(mathFixed, @"document\.getElementById\('dlbutton'\)\.href", "linkbits");
+            mathFixed = Regex.Replace(mathFixed, "<script type=\"text/javascript\">", "var e = function(){");
+            mathFixed = Regex.Replace(mathFixed, "</script>", "}; e();");
+
+            #endregion         
+            
+            var engine = new Jurassic.ScriptEngine();
+            var fuckingfinallyitactuallyworks = engine.Evaluate(mathFixed);
+            
+            return fuckingfinallyitactuallyworks.ToString();
+        }
 
         public static string ZippyGetFileLink(string rawZippyUrl) {
+            #region LinkValidityCheck
             //checking if it's a valid zippyshare url (matches "https" through"/v/someIdentifier")
             var m = Regex.Match(rawZippyUrl, @"https?://((?:[\w\-]+))\.*zippyshare\.com/\w/(\w+)",
                 RegexOptions.IgnoreCase);
             if (!m.Success) {
                 return ("Invalid zippyshare link!");
             }
-
-            // I believe this is breaking the thing up into the first bit and the unique ID
             var server = m.Groups[1].Captures[0].Value;
-
-            //Gets the Matched string that contains all the info needed to assemble the link
+            #endregion
+            
+            //gets the Matched string that contains all the info needed to assemble the link
             string website = new WebClient().DownloadString(rawZippyUrl);
+            
+            //Verifying that the file exists
+            #region FileExistsCheck
 
             //Verifying that the file exists
             var regex = "File does not exist on this server";
@@ -45,26 +84,11 @@ namespace GG_Downloader {
                 return ("File doesn't exist!");
             }
 
-            // extracting the line of JS that is used to generate the file link 
-            var pattern_elements =
-                @"document\.getElementById\('dlbutton'\)\.href = ""/(pd|d)/(.*)/"" \+ \(([0-9]+) % ([0-9]+) \+ ([0-9]+) % ([0-9]+)\) \+ ""/(.*)"";";
-            string matchedString = Regex.Match(website, pattern_elements, RegexOptions.IgnoreCase).ToString();
-
-            // Console.WriteLine(matchedString);
-
-            //Parsing the numbers out of the string
-            List<int> nums = new List<int>();
-            foreach (Match match in Regex.Matches((Regex.Match(matchedString, "(?<=( \\())(.*)(?=(\\)))").ToString()),
-                         "(\\d+)")) {
-                nums.Add(int.Parse(match.ToString()));
-            }
-
-            var fileId = Regex.Match(matchedString, "(?<=( \")).*(?=(\" ))").ToString();
-
-            var fileName = (Regex.Match(matchedString, "(?<=(\\+ \")).*(?=(\";))").ToString());
-
-            var fileNumber = nums[0] % nums[1] + nums[2] % nums[3];
-            return ("https://" + server + ".zippyshare.com" + fileId + fileNumber + fileName);
+            #endregion
+            
+            //extracting the line of JS that is used to generate the file link
+            var constructedFilePath = $"https://{server}.zippyshare.com{ZippyExtractDLlink(website)}";
+            return constructedFilePath;
         }
 
         public static double ZippyGetFileSize(string rawZippyUrl) {
@@ -97,7 +121,7 @@ namespace GG_Downloader {
             
             try {
                 WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(120));
-                wait.Until(e => e.FindElement(By.XPath("/html/body/div[4]/div[2]/div/div[2]/div/div[1]")));
+                wait.Until(e => e.FindElement(By.XPath("/html/body/div[4]/div[2]/div/div[2]/div[1]/div[3]/div[3]/a[1]")));
             }
             catch (FormatException e) {
                 Console.WriteLine($"{e}\nWaiting for the element to exist failed, falling back to iteratively checking for Zippy Links.");
@@ -118,6 +142,7 @@ namespace GG_Downloader {
             IList<string> foundFilteredLinks = new List<string>();
             foreach (IWebElement e in foundLinks) {
                 if (e.GetAttribute(("href")).Contains("zippy")) {
+                    Console.WriteLine(e.GetAttribute(("href")));
                     foundFilteredLinks.Add(e.GetAttribute(("href")));
                 }
             }
@@ -159,8 +184,8 @@ namespace GG_Downloader {
         }
 
         public static string GogLinkConversion(string gogLink) {
-            string gogGamesLink = Regex.IsMatch(gogLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/\w+")
-                ? Regex.Replace(gogLink, @"https:\/\/www\.gog\.com\/[a-z][a-z]\/game\/",
+            string gogGamesLink = Regex.IsMatch(gogLink, @"https:\/\/www\.gog\.com(\/[a-z][a-z])?\/game\/\w+")
+                ? Regex.Replace(gogLink, @"https:\/\/www\.gog\.com(\/[a-z][a-z])?\/game\/",
                     @"https://www.gog-games.com/game/")
                 : gogLink.Replace("https://gog.com", "https://gog-games.com");
             return IsGgPageFound(gogGamesLink)
