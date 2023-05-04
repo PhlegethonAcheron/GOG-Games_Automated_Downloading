@@ -1,3 +1,6 @@
+# NOTE:
+This doesn't work anymore, it relied on zippyshare, the hardcoded gog-games.com domain, both of which have disappeared. Feel Free to fix it, but you'll need to read through a painful amount of regexes.
+
 # GOG-Games_Automated_Downloading
 Simple-to-use command line interface that will automate the sourcing, downloading, and installation of gog.com games. As this is the first version, more made as a (functional) proof-of-concept than anything, the options are limited.        
 If anybody somehow stumbles across this little program, finds it useful enough to actually use, and wants features added, feel free to create an issue, I should be able to get to it rather quickly.      
